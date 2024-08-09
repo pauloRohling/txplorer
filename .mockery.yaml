@@ -1,0 +1,13 @@
+with-expecter: True
+dir: "./mocks/{{.PackageName}}"
+filename: "{{.InterfaceName | snakecase}}.go"
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "mock{{.PackageName}}"
+all: True
+packages:
+  xplorer/internal/domain/transaction:
+    config:
+      all: True
+  xplorer/pkg/transaction:
+    config:
+      all: True

@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./internal/persistance/queries/query.sql"
+    schema: "./internal/persistance/queries/schema.sql"
+    gen:
+      go:
+        package: "queries"
+        out: "./internal/persistance/queries"
+        emit_json_tags: true
+        json_tags_case_style: "camel"
