@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"xplorer/internal/model"
-	tx "xplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/domain/repository"
+	"github.com/pauloRohling/txplorer/internal/model"
+	tx "github.com/pauloRohling/txplorer/pkg/transaction"
 )
 
 type TransferInput struct {
@@ -20,11 +21,15 @@ type TransferOutput struct {
 
 type TransferAction struct {
 	transactionManager    tx.Manager
-	accountRepository     AccountRepository
-	transactionRepository TransactionRepository
+	accountRepository     repository.AccountRepository
+	transactionRepository repository.TransactionRepository
 }
 
-func NewTransferAction(transactionManager tx.Manager, accountRepository AccountRepository, transactionRepository TransactionRepository) *TransferAction {
+func NewTransferAction(
+	transactionManager tx.Manager,
+	accountRepository repository.AccountRepository,
+	transactionRepository repository.TransactionRepository,
+) *TransferAction {
 	return &TransferAction{
 		transactionManager:    transactionManager,
 		accountRepository:     accountRepository,

@@ -1,9 +1,9 @@
-package transaction
+package repository
 
 import (
 	"context"
 	"github.com/google/uuid"
-	"xplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/model"
 )
 
 type AccountRepository interface {

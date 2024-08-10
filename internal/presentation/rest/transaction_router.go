@@ -1,9 +1,9 @@
 package rest
 
 import (
+	"github.com/pauloRohling/txplorer/internal/domain/transaction"
+	"github.com/pauloRohling/txplorer/internal/presentation/json"
 	"net/http"
-	"xplorer/internal/domain/transaction"
-	"xplorer/internal/presentation/json"
 )
 
 type TransactionRouter struct {

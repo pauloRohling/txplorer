@@ -1,4 +1,4 @@
-BINARY_NAME = xplorer
+BINARY_NAME = txplorer
 MAIN_PACKAGE_PATH = ./cmd
 QUERIES_PACKAGE_PATH = ./internal/persistance/queries
 

@@ -1,13 +1,13 @@
 with-expecter: True
 dir: "./mocks/{{.PackageName}}"
-filename: "{{.InterfaceName | snakecase}}.go"
+filename: "mock_{{.InterfaceName | snakecase}}.go"
 mockname: "Mock{{.InterfaceName}}"
 outpkg: "mock{{.PackageName}}"
 all: True
 packages:
-  xplorer/internal/domain/transaction:
+  github.com/pauloRohling/txplorer/internal/domain/repository:
     config:
       all: True
-  xplorer/pkg/transaction:
+  github.com/pauloRohling/txplorer/pkg/transaction:
     config:
       all: True

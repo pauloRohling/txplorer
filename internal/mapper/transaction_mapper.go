@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	"xplorer/internal/model"
-	"xplorer/internal/persistance/queries"
+	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/persistance/store"
 )
 
 type TransactionMapper struct {
@@ -12,7 +12,7 @@ func NewTransactionMapper() *TransactionMapper {
 	return &TransactionMapper{}
 }
 
-func (mapper *TransactionMapper) ToModel(transaction queries.Transaction) *model.Transaction {
+func (mapper *TransactionMapper) ToModel(transaction store.Transaction) *model.Transaction {
 	return &model.Transaction{
 		ID:            transaction.ID,
 		FromAccountID: transaction.FromAccountID,

@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"xplorer/internal/domain/transaction"
+	"github.com/pauloRohling/txplorer/internal/domain/transaction"
 )
 
 type TransactionService interface {

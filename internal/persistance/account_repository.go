@@ -4,28 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
-	"xplorer/internal/model"
-	"xplorer/internal/persistance/queries"
-	"xplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/persistance/mapper"
+	"github.com/pauloRohling/txplorer/internal/persistance/store"
+	"github.com/pauloRohling/txplorer/pkg/transaction"
 )
 
 type AccountRepository struct {
 	db            *sql.DB
-	accountMapper AccountMapper
+	accountMapper mapper.AccountMapper
 }
 
-func NewAccountRepository(db *sql.DB, accountMapper AccountMapper) *AccountRepository {
+func NewAccountRepository(db *sql.DB, accountMapper mapper.AccountMapper) *AccountRepository {
 	return &AccountRepository{
 		db:            db,
 		accountMapper: accountMapper,
 	}
 }
 
-func (repository *AccountRepository) query(ctx context.Context) *queries.Queries {
+func (repository *AccountRepository) query(ctx context.Context) *store.Queries {
 	if tx := transaction.FromContext(ctx); tx != nil {
-		return queries.New(tx)
+		return store.New(tx)
 	}
-	return queries.New(repository.db)
+	return store.New(repository.db)
 }
 
 func (repository *AccountRepository) Create(ctx context.Context, id uuid.UUID) (*model.Account, error) {
@@ -49,7 +50,7 @@ func (repository *AccountRepository) FindById(ctx context.Context, id uuid.UUID)
 }
 
 func (repository *AccountRepository) AddBalanceById(ctx context.Context, id uuid.UUID, balance int64) (*model.Account, error) {
-	account, err := repository.query(ctx).AddBalanceById(ctx, queries.AddBalanceByIdParams{
+	account, err := repository.query(ctx).AddBalanceById(ctx, store.AddBalanceByIdParams{
 		ID:      id,
 		Balance: balance,
 	})

@@ -4,32 +4,33 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
-	"xplorer/internal/model"
-	"xplorer/internal/persistance/queries"
-	"xplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/persistance/mapper"
+	"github.com/pauloRohling/txplorer/internal/persistance/store"
+	"github.com/pauloRohling/txplorer/pkg/transaction"
 )
 
 type TransactionRepository struct {
 	db                *sql.DB
-	transactionMapper TransactionMapper
+	transactionMapper mapper.TransactionMapper
 }
 
-func NewTransactionRepository(db *sql.DB, transactionMapper TransactionMapper) *TransactionRepository {
+func NewTransactionRepository(db *sql.DB, transactionMapper mapper.TransactionMapper) *TransactionRepository {
 	return &TransactionRepository{
 		db:                db,
 		transactionMapper: transactionMapper,
 	}
 }
 
-func (repository *TransactionRepository) query(ctx context.Context) *queries.Queries {
+func (repository *TransactionRepository) query(ctx context.Context) *store.Queries {
 	if tx := transaction.FromContext(ctx); tx != nil {
-		return queries.New(tx)
+		return store.New(tx)
 	}
-	return queries.New(repository.db)
+	return store.New(repository.db)
 }
 
 func (repository *TransactionRepository) Create(ctx context.Context, entity *model.Transaction) (*model.Transaction, error) {
-	transactionEntity, err := repository.query(ctx).InsertTransaction(ctx, queries.InsertTransactionParams{
+	transactionEntity, err := repository.query(ctx).InsertTransaction(ctx, store.InsertTransactionParams{
 		ID:            entity.ID,
 		FromAccountID: entity.FromAccountID,
 		ToAccountID:   entity.ToAccountID,
@@ -46,7 +47,7 @@ func (repository *TransactionRepository) Create(ctx context.Context, entity *mod
 }
 
 func (repository *TransactionRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.TransactionStatus) (*model.Transaction, error) {
-	transactionEntity, err := repository.query(ctx).UpdateTransactionStatus(ctx, queries.UpdateTransactionStatusParams{
+	transactionEntity, err := repository.query(ctx).UpdateTransactionStatus(ctx, store.UpdateTransactionStatusParams{
 		ID:     id,
 		Status: status.String(),
 	})

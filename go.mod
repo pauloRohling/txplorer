@@ -1,4 +1,4 @@
-module xplorer
+module github.com/pauloRohling/txplorer
 
 go 1.22
 

@@ -5,20 +5,20 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/lib/pq"
+	"github.com/pauloRohling/txplorer/internal/domain/transaction"
+	"github.com/pauloRohling/txplorer/internal/mapper"
+	"github.com/pauloRohling/txplorer/internal/persistance"
+	"github.com/pauloRohling/txplorer/internal/presentation/json"
+	"github.com/pauloRohling/txplorer/internal/presentation/rest"
+	tx "github.com/pauloRohling/txplorer/pkg/transaction"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
-	"xplorer/internal/domain/transaction"
-	"xplorer/internal/mapper"
-	"xplorer/internal/persistance"
-	"xplorer/internal/presentation/json"
-	"xplorer/internal/presentation/rest"
-	tx "xplorer/pkg/transaction"
 )
 
 func main() {
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/xplorer?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/txplorer?sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +31,11 @@ func main() {
 	accountRepository := persistance.NewAccountRepository(db, accountMapper)
 	transactionRepository := persistance.NewTransactionRepository(db, transactionMapper)
 
-	transferAction := transaction.NewTransferAction(txManager, accountRepository, transactionRepository)
+	transferAction := transaction.NewTransferAction(
+		txManager,
+		accountRepository,
+		transactionRepository,
+	)
 
 	transactionService := transaction.NewService(transferAction)
 

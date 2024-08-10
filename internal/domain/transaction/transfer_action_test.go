@@ -4,19 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/txplorer/internal/model"
+	mockrepository "github.com/pauloRohling/txplorer/mocks/repository"
+	mocktransaction "github.com/pauloRohling/txplorer/mocks/transaction"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"testing"
-	"xplorer/internal/model"
-	mocktransaction "xplorer/mocks/transaction"
 )
 
 type TransferActionSuite struct {
 	suite.Suite
 	action                *TransferAction
 	transactionManager    *mocktransaction.MockManager
-	accountRepository     *mocktransaction.MockAccountRepository
-	transactionRepository *mocktransaction.MockTransactionRepository
+	accountRepository     *mockrepository.MockAccountRepository
+	transactionRepository *mockrepository.MockTransactionRepository
 }
 
 func TestTransferActionSuite(t *testing.T) {
@@ -26,8 +27,8 @@ func TestTransferActionSuite(t *testing.T) {
 func (suite *TransferActionSuite) SetupTest() {
 	t := suite.T()
 	suite.transactionManager = mocktransaction.NewMockManager(t)
-	suite.accountRepository = mocktransaction.NewMockAccountRepository(t)
-	suite.transactionRepository = mocktransaction.NewMockTransactionRepository(t)
+	suite.accountRepository = mockrepository.NewMockAccountRepository(t)
+	suite.transactionRepository = mockrepository.NewMockTransactionRepository(t)
 	suite.action = NewTransferAction(
 		suite.transactionManager,
 		suite.accountRepository,
