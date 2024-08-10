@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/lib/pq"
-	"github.com/pauloRohling/txplorer/internal/domain/transaction"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistance"
 	"github.com/pauloRohling/txplorer/internal/presentation/json"
@@ -26,18 +26,18 @@ func main() {
 	txManager := tx.NewPostgresTxManager(db)
 
 	accountMapper := mapper.NewAccountMapper()
-	transactionMapper := mapper.NewTransactionMapper()
+	transactionMapper := mapper.NewOperationMapper()
 
 	accountRepository := persistance.NewAccountRepository(db, accountMapper)
 	transactionRepository := persistance.NewTransactionRepository(db, transactionMapper)
 
-	transferAction := transaction.NewTransferAction(
+	transferAction := operation.NewTransferAction(
 		txManager,
 		accountRepository,
 		transactionRepository,
 	)
 
-	transactionService := transaction.NewService(transferAction)
+	transactionService := operation.NewService(transferAction)
 
 	transactionRouter := rest.NewTransactionRouter(transactionService)
 

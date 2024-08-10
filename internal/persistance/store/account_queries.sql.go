@@ -15,7 +15,7 @@ const addBalanceById = `-- name: AddBalanceById :one
 UPDATE accounts
 SET balance = balance + $1
 WHERE id = $2
-RETURNING id, balance
+RETURNING id, balance, user_id, created_at, updated_at, status
 `
 
 type AddBalanceByIdParams struct {
@@ -26,32 +26,38 @@ type AddBalanceByIdParams struct {
 func (q *Queries) AddBalanceById(ctx context.Context, arg AddBalanceByIdParams) (Account, error) {
 	row := q.db.QueryRowContext(ctx, addBalanceById, arg.Balance, arg.ID)
 	var i Account
-	err := row.Scan(&i.ID, &i.Balance)
-	return i, err
-}
-
-const getAccountById = `-- name: GetAccountById :one
-SELECT id, balance
-FROM accounts
-WHERE id = $1
-`
-
-func (q *Queries) GetAccountById(ctx context.Context, id uuid.UUID) (Account, error) {
-	row := q.db.QueryRowContext(ctx, getAccountById, id)
-	var i Account
-	err := row.Scan(&i.ID, &i.Balance)
+	err := row.Scan(
+		&i.ID,
+		&i.Balance,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Status,
+	)
 	return i, err
 }
 
 const insertAccount = `-- name: InsertAccount :one
-INSERT INTO accounts (id)
-VALUES ($1)
-RETURNING id, balance
+INSERT INTO accounts (id, user_id)
+VALUES ($1, $2)
+RETURNING id, balance, user_id, created_at, updated_at, status
 `
 
-func (q *Queries) InsertAccount(ctx context.Context, id uuid.UUID) (Account, error) {
-	row := q.db.QueryRowContext(ctx, insertAccount, id)
+type InsertAccountParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"userId"`
+}
+
+func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, insertAccount, arg.ID, arg.UserID)
 	var i Account
-	err := row.Scan(&i.ID, &i.Balance)
+	err := row.Scan(
+		&i.ID,
+		&i.Balance,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Status,
+	)
 	return i, err
 }

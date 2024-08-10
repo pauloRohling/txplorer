@@ -29,18 +29,11 @@ func (repository *AccountRepository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.db)
 }
 
-func (repository *AccountRepository) Create(ctx context.Context, id uuid.UUID) (*model.Account, error) {
-	account, err := repository.query(ctx).InsertAccount(ctx, id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return repository.accountMapper.ToModel(account), nil
-}
-
-func (repository *AccountRepository) FindById(ctx context.Context, id uuid.UUID) (*model.Account, error) {
-	account, err := repository.query(ctx).GetAccountById(ctx, id)
+func (repository *AccountRepository) Create(ctx context.Context, id uuid.UUID, userId uuid.UUID) (*model.Account, error) {
+	account, err := repository.query(ctx).InsertAccount(ctx, store.InsertAccountParams{
+		ID:     id,
+		UserID: userId,
+	})
 
 	if err != nil {
 		return nil, err

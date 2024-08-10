@@ -5,6 +5,6 @@ import (
 	"github.com/pauloRohling/txplorer/internal/persistance/store"
 )
 
-type TransactionMapper interface {
-	ToModel(transaction store.Transaction) *model.Transaction
+type OperationMapper interface {
+	ToModel(operation store.Operation) *model.Operation
 }

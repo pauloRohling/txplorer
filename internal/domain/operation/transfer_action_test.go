@@ -1,4 +1,4 @@
-package transaction
+package operation
 
 import (
 	"context"
@@ -14,10 +14,10 @@ import (
 
 type TransferActionSuite struct {
 	suite.Suite
-	action                *TransferAction
-	transactionManager    *mocktransaction.MockManager
-	accountRepository     *mockrepository.MockAccountRepository
-	transactionRepository *mockrepository.MockTransactionRepository
+	action              *TransferAction
+	transactionManager  *mocktransaction.MockManager
+	accountRepository   *mockrepository.MockAccountRepository
+	operationRepository *mockrepository.MockOperationRepository
 }
 
 func TestTransferActionSuite(t *testing.T) {
@@ -28,11 +28,11 @@ func (suite *TransferActionSuite) SetupTest() {
 	t := suite.T()
 	suite.transactionManager = mocktransaction.NewMockManager(t)
 	suite.accountRepository = mockrepository.NewMockAccountRepository(t)
-	suite.transactionRepository = mockrepository.NewMockTransactionRepository(t)
+	suite.operationRepository = mockrepository.NewMockOperationRepository(t)
 	suite.action = NewTransferAction(
 		suite.transactionManager,
 		suite.accountRepository,
-		suite.transactionRepository,
+		suite.operationRepository,
 	)
 }
 
@@ -43,7 +43,12 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 		Amount:        100,
 	}
 
-	expectedTransaction := model.NewTransaction(input.FromAccountID, input.ToAccountID, input.Amount)
+	expectedTransaction := &model.Operation{
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
+	}
+
 	expectedAccount := &model.Account{
 		ID:      input.ToAccountID,
 		Balance: 10000,
@@ -55,11 +60,11 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 			return fn(ctx)
 		})
 
-	suite.transactionRepository.EXPECT().
+	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
 		Return(expectedTransaction, nil)
 
-	suite.transactionRepository.EXPECT().
+	suite.operationRepository.EXPECT().
 		UpdateStatus(mock.Anything, mock.Anything, mock.Anything).
 		Return(expectedTransaction, nil)
 
@@ -72,9 +77,9 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 	suite.NoError(err)
 	suite.NotNil(output)
 
-	suite.Equal(input.FromAccountID, output.Transaction.FromAccountID)
-	suite.Equal(input.ToAccountID, output.Transaction.ToAccountID)
-	suite.Equal(input.Amount, output.Transaction.Amount)
+	suite.Equal(input.FromAccountID, output.Operation.FromAccountID)
+	suite.Equal(input.ToAccountID, output.Operation.ToAccountID)
+	suite.Equal(input.Amount, output.Operation.Amount)
 }
 
 func (suite *TransferActionSuite) TestShouldFailTransferWithInvalidInputs() {
@@ -99,7 +104,7 @@ func (suite *TransferActionSuite) TestShouldFailOnTransactionCreationError() {
 		Amount:        100,
 	}
 
-	suite.transactionRepository.EXPECT().
+	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
 		Return(nil, fmt.Errorf("failed to create transaction"))
 
@@ -115,9 +120,13 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 		Amount:        100,
 	}
 
-	expectedTransaction := model.NewTransaction(input.FromAccountID, input.ToAccountID, input.Amount)
+	expectedTransaction := &model.Operation{
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
+	}
 
-	suite.transactionRepository.EXPECT().
+	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
 		Return(expectedTransaction, nil)
 
@@ -125,8 +134,8 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 		RunTransaction(mock.Anything, mock.Anything).
 		Return(fmt.Errorf("failed to update balances"))
 
-	suite.transactionRepository.EXPECT().
-		UpdateStatus(mock.Anything, expectedTransaction.ID, model.TransactionStatusFailed).
+	suite.operationRepository.EXPECT().
+		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusFailed).
 		Return(expectedTransaction, nil)
 
 	output, err := suite.action.Execute(context.TODO(), input)
@@ -141,9 +150,13 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusError() {
 		Amount:        100,
 	}
 
-	expectedTransaction := model.NewTransaction(input.FromAccountID, input.ToAccountID, input.Amount)
+	expectedTransaction := &model.Operation{
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
+	}
 
-	suite.transactionRepository.EXPECT().
+	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
 		Return(expectedTransaction, nil)
 
@@ -151,8 +164,8 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusError() {
 		RunTransaction(mock.Anything, mock.Anything).
 		Return(fmt.Errorf("failed to update balances"))
 
-	suite.transactionRepository.EXPECT().
-		UpdateStatus(mock.Anything, expectedTransaction.ID, model.TransactionStatusFailed).
+	suite.operationRepository.EXPECT().
+		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusFailed).
 		Return(nil, fmt.Errorf("failed to update status"))
 
 	output, err := suite.action.Execute(context.TODO(), input)
@@ -210,7 +223,12 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		Amount:        100,
 	}
 
-	expectedTransaction := model.NewTransaction(input.FromAccountID, input.ToAccountID, input.Amount)
+	expectedTransaction := &model.Operation{
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
+	}
+
 	expectedAccount := &model.Account{
 		ID:      input.ToAccountID,
 		Balance: 10000,
@@ -221,8 +239,8 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		Return(expectedAccount, nil).
 		Times(2)
 
-	suite.transactionRepository.EXPECT().
-		UpdateStatus(mock.Anything, expectedTransaction.ID, model.TransactionStatusSuccess).
+	suite.operationRepository.EXPECT().
+		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusSuccess).
 		Return(nil, fmt.Errorf("failed to update status"))
 
 	output, err := suite.action.updateBalances(context.TODO(), input, expectedTransaction.ID)

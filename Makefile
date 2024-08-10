@@ -1,6 +1,8 @@
 BINARY_NAME = txplorer
 MAIN_PACKAGE_PATH = ./cmd
 QUERIES_PACKAGE_PATH = ./internal/persistance/queries
+SCHEMA_PACKAGE_PATH = ./internal/persistance/schema
+POSTGRES_URL = "postgres://postgres:postgres@localhost:5432/txplorer?sslmode=disable"
 
 ## help: print this help message
 .PHONY: help
@@ -23,6 +25,26 @@ up:
 down:
 	docker-compose down
 
+.PHONY: migrate-up
+## migrate-up: execute all migrations
+migrate-up:
+	docker run -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) up
+
+.PHONY: migrate-down
+## migrate-down: revert all migrations
+migrate-down:
+	docker run -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down
+
+.PHONY: migration
+## migration name=?: create a new migration
+migration:
+	docker run -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(SCHEMA_PACKAGE_PATH) -seq $(name)
+
+## sql: generate all sql related code
+.PHONY: sql
+sql:
+	docker run --rm -v .:/src -w /src sqlc/sqlc generate -f="./sqlc.yml"
+
 ## mock: generate mocks
 .PHONY: mock
 mock:
@@ -39,7 +61,7 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=./tmp/coverage.out ./internal/...
 	go tool cover -html=./tmp/coverage.out
 
-## sql: generate all sql related code
-.PHONY: sql
-sql:
-	docker run --rm -v .:/src -w /src sqlc/sqlc generate -f="./sqlc.yml"
+## run: run the application
+.PHONY: run
+run:
+	go run -v ./cmd/main.go

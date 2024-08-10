@@ -11,15 +11,30 @@ import (
 )
 
 type Account struct {
-	ID      uuid.UUID `json:"id"`
-	Balance int64     `json:"balance"`
+	ID        uuid.UUID `json:"id"`
+	Balance   int64     `json:"balance"`
+	UserID    uuid.UUID `json:"userId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Status    string    `json:"status"`
 }
 
-type Transaction struct {
+type Operation struct {
 	ID            uuid.UUID `json:"id"`
 	FromAccountID uuid.UUID `json:"fromAccountId"`
 	ToAccountID   uuid.UUID `json:"toAccountId"`
 	Amount        int64     `json:"amount"`
-	Timestamp     time.Time `json:"timestamp"`
+	Type          string    `json:"type"`
+	CreatedAt     time.Time `json:"createdAt"`
+	CreatedBy     uuid.UUID `json:"createdBy"`
 	Status        string    `json:"status"`
+}
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

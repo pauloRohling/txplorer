@@ -84,6 +84,66 @@ func (_c *MockAccountRepository_AddBalanceById_Call) RunAndReturn(run func(conte
 	return _c
 }
 
+// Create provides a mock function with given fields: ctx, id, userId
+func (_m *MockAccountRepository) Create(ctx context.Context, id uuid.UUID, userId uuid.UUID) (*model.Account, error) {
+	ret := _m.Called(ctx, id, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 *model.Account
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.Account, error)); ok {
+		return rf(ctx, id, userId)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.Account); ok {
+		r0 = rf(ctx, id, userId)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Account)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(ctx, id, userId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockAccountRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type MockAccountRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - userId uuid.UUID
+func (_e *MockAccountRepository_Expecter) Create(ctx interface{}, id interface{}, userId interface{}) *MockAccountRepository_Create_Call {
+	return &MockAccountRepository_Create_Call{Call: _e.mock.On("Create", ctx, id, userId)}
+}
+
+func (_c *MockAccountRepository_Create_Call) Run(run func(ctx context.Context, id uuid.UUID, userId uuid.UUID)) *MockAccountRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_Create_Call) Return(_a0 *model.Account, _a1 error) *MockAccountRepository_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockAccountRepository_Create_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (*model.Account, error)) *MockAccountRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockAccountRepository creates a new instance of MockAccountRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockAccountRepository(t interface {

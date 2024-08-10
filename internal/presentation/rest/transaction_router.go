@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/pauloRohling/txplorer/internal/domain/transaction"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/presentation/json"
 	"net/http"
 )
@@ -14,8 +14,8 @@ func NewTransactionRouter(transactionService TransactionService) *TransactionRou
 	return &TransactionRouter{transactionService: transactionService}
 }
 
-func (router *TransactionRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*transaction.TransferOutput, error) {
-	input, err := json.Parse[transaction.TransferInput](r)
+func (router *TransactionRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
+	input, err := json.Parse[operation.TransferInput](r)
 	if err != nil {
 		return nil, err
 	}

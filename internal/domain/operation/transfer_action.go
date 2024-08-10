@@ -1,4 +1,4 @@
-package transaction
+package operation
 
 import (
 	"context"
@@ -7,33 +7,35 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/repository"
 	"github.com/pauloRohling/txplorer/internal/model"
 	tx "github.com/pauloRohling/txplorer/pkg/transaction"
+	"time"
 )
 
 type TransferInput struct {
 	FromAccountID uuid.UUID `json:"fromAccountId"`
 	ToAccountID   uuid.UUID `json:"toAccountId"`
 	Amount        int64     `json:"amount"`
+	RequesterID   uuid.UUID `json:"requesterId"`
 }
 
 type TransferOutput struct {
-	*model.Transaction
+	*model.Operation
 }
 
 type TransferAction struct {
-	transactionManager    tx.Manager
-	accountRepository     repository.AccountRepository
-	transactionRepository repository.TransactionRepository
+	transactionManager  tx.Manager
+	accountRepository   repository.AccountRepository
+	operationRepository repository.OperationRepository
 }
 
 func NewTransferAction(
 	transactionManager tx.Manager,
 	accountRepository repository.AccountRepository,
-	transactionRepository repository.TransactionRepository,
+	operationRepository repository.OperationRepository,
 ) *TransferAction {
 	return &TransferAction{
-		transactionManager:    transactionManager,
-		accountRepository:     accountRepository,
-		transactionRepository: transactionRepository,
+		transactionManager:  transactionManager,
+		accountRepository:   accountRepository,
+		operationRepository: operationRepository,
 	}
 }
 
@@ -46,33 +48,46 @@ func (action *TransferAction) Execute(ctx context.Context, input TransferInput) 
 		return nil, fmt.Errorf("[TransferAction] invalid amount: %d", input.Amount)
 	}
 
-	newTransaction := model.NewTransaction(input.FromAccountID, input.ToAccountID, input.Amount)
-	transaction, err := action.transactionRepository.Create(ctx, newTransaction)
+	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to create transaction: %w", err)
+		return nil, fmt.Errorf("[TransferAction] failed to generate operation id: %w", err)
 	}
 
-	transactionId := transaction.ID
+	transferOperation := &model.Operation{
+		ID:            operationId,
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
+		Type:          model.OperationTypeTransfer.String(),
+		CreatedAt:     time.Now().UTC(),
+		CreatedBy:     input.RequesterID,
+		Status:        model.OperationStatusPending.String(),
+	}
+
+	operation, err := action.operationRepository.Create(ctx, transferOperation)
+	if err != nil {
+		return nil, fmt.Errorf("[TransferAction] failed to create operation: %w", err)
+	}
 
 	err = action.transactionManager.RunTransaction(ctx, func(ctx context.Context) error {
-		transaction, err = action.updateBalances(ctx, input, transactionId)
+		operation, err = action.updateBalances(ctx, input, operationId)
 		return err
 	})
 
 	if err != nil {
-		_, errTransaction := action.transactionRepository.UpdateStatus(ctx, transactionId, model.TransactionStatusFailed)
-		if errTransaction != nil {
-			return nil, fmt.Errorf("[TransferAction] failed to update transaction %s status to FAILED: %w", transactionId, errTransaction)
+		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusFailed)
+		if errOperation != nil {
+			return nil, fmt.Errorf("[TransferAction] failed to update operation %s status to FAILED: %w", operationId, errOperation)
 		}
 		return nil, err
 	}
 
-	return &TransferOutput{Transaction: transaction}, nil
+	return &TransferOutput{Operation: operation}, nil
 }
 
 // UpdateBalances updates the balance of the sender and receiver accounts.
 // Must be called inside a transaction.
-func (action *TransferAction) updateBalances(ctx context.Context, input TransferInput, transactionId uuid.UUID) (*model.Transaction, error) {
+func (action *TransferAction) updateBalances(ctx context.Context, input TransferInput, operationId uuid.UUID) (*model.Operation, error) {
 	fromAccount, err := action.accountRepository.AddBalanceById(ctx, input.FromAccountID, input.Amount*-1)
 	if err != nil {
 		return nil, fmt.Errorf("[TransferAction] failed to update account %s balance: %w", input.FromAccountID, err)
@@ -91,10 +106,10 @@ func (action *TransferAction) updateBalances(ctx context.Context, input Transfer
 		return nil, fmt.Errorf("[TransferAction] account %s balance is negative: %d", input.ToAccountID, toAccount.Balance)
 	}
 
-	transaction, err := action.transactionRepository.UpdateStatus(ctx, transactionId, model.TransactionStatusSuccess)
+	operation, err := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusSuccess)
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to update transaction %s status to SUCCESS: %w", transactionId, err)
+		return nil, fmt.Errorf("[TransferAction] failed to update operation %s status to SUCCESS: %w", operationId, err)
 	}
 
-	return transaction, nil
+	return operation, nil
 }
