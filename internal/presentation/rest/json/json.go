@@ -11,18 +11,6 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-func Endpoint[T any](method func(http.ResponseWriter, *http.Request) (T, error), status int) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		result, err := method(w, r)
-		if err != nil {
-			WriteError(w, err)
-			return
-		}
-
-		WriteJSON(w, status, result)
-	}
-}
-
 func Parse[T any](r *http.Request) (*T, error) {
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(r.Body)
 
