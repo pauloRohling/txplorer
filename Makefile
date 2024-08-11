@@ -28,17 +28,17 @@ down:
 .PHONY: migrate-up
 ## migrate-up: execute all migrations
 migrate-up:
-	docker run -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) up
+	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) up
 
 .PHONY: migrate-down
 ## migrate-down: revert all migrations
 migrate-down:
-	docker run -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down
+	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down
 
 .PHONY: migration
 ## migration name=?: create a new migration
 migration:
-	docker run -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(SCHEMA_PACKAGE_PATH) -seq $(name)
+	docker run --rm -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(SCHEMA_PACKAGE_PATH) -seq $(name)
 
 ## sql: generate all sql related code
 .PHONY: sql

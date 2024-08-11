@@ -3,22 +3,72 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistance"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
+	"github.com/pauloRohling/txplorer/pkg/banner"
+	"github.com/pauloRohling/txplorer/pkg/env"
+	"github.com/pauloRohling/txplorer/pkg/envconfig"
 	"github.com/pauloRohling/txplorer/pkg/graceful"
 	tx "github.com/pauloRohling/txplorer/pkg/transaction"
 	"log/slog"
 	"os"
 )
 
-func main() {
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/txplorer?sslmode=disable")
+var environment env.Environment
+
+func getDatabaseConnectionString() string {
+	ssl := "disable"
+	if environment.Database.SSL {
+		ssl = "require"
+	}
+
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		environment.Database.User,
+		environment.Database.Password,
+		environment.Database.Host,
+		environment.Database.Port,
+		environment.Database.Name,
+		ssl,
+	)
+}
+
+func getDatabaseConnection() (*sql.DB, error) {
+	db, err := sql.Open("postgres", getDatabaseConnectionString())
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	db.SetMaxOpenConns(environment.Database.Pool.MaxOpenConns)
+	db.SetMaxIdleConns(environment.Database.Pool.MaxIdleConns)
+	db.SetConnMaxLifetime(environment.Database.Pool.ConnMaxLifetime)
+	db.SetConnMaxIdleTime(environment.Database.Pool.ConnMaxIdleTime)
+
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func main() {
+	banner.Show()
+	_, _ = envconfig.Init(&environment)
+
+	if err := environment.Validate(); err != nil {
+		slog.Error(err.Error())
+		os.Exit(-1)
+	}
+
+	db, err := getDatabaseConnection()
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(-1)
 	}
 
 	txManager := tx.NewPostgresTxManager(db)
