@@ -35,6 +35,11 @@ func main() {
 		slog.Error(err.Error())
 		os.Exit(-1)
 	}
+	defer func(db *sql.DB) {
+		if err = db.Close(); err != nil {
+			slog.Error("Could not close database connection", "error", err.Error())
+		}
+	}(db)
 
 	txManager := tx.NewPostgresTxManager(db)
 
