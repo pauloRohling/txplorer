@@ -17,9 +17,13 @@ import (
 	tx "github.com/pauloRohling/txplorer/pkg/transaction"
 	"log/slog"
 	"os"
+	"time"
 )
 
-var environment env.Environment
+var (
+	start       = time.Now()
+	environment env.Environment
+)
 
 func main() {
 	banner.Show()
@@ -73,7 +77,7 @@ func main() {
 
 	httpServer.AddRoute(transactionRouter)
 
-	slog.Info("Web server started listening on", "port", environment.Server.Port)
+	slog.Info("Web server started listening on", "port", environment.Server.Port, "startup time", time.Since(start))
 	if err = httpServer.Start(); err != nil {
 		slog.Error("Could not start web server", "port", environment.Server.Port)
 		os.Exit(-1)
