@@ -33,7 +33,7 @@ migrate-up:
 .PHONY: migrate-down
 ## migrate-down: revert all migrations
 migrate-down:
-	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down
+	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down -all
 
 .PHONY: migration
 ## migration name=?: create a new migration

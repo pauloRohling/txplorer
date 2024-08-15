@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS operations
     to_account_id   UUID              NOT NULL,
     amount          BIGINT            NOT NULL,
     type            CHARACTER VARYING NOT NULL,
-    created_at      TIMESTAMP         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at      TIMESTAMP         NOT NULL DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
     created_by      UUID              NOT NULL,
     status          CHARACTER VARYING NOT NULL DEFAULT 'PENDING',
 
