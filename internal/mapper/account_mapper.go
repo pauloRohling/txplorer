@@ -19,6 +19,6 @@ func (mapper *AccountMapper) ToModel(account store.Account) *model.Account {
 		UserID:    account.UserID,
 		CreatedAt: account.CreatedAt,
 		UpdatedAt: account.UpdatedAt,
-		Status:    account.Status,
+		Status:    model.AccountStatus(account.Status),
 	}
 }
