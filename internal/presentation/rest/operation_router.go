@@ -5,14 +5,15 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
+	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
 )
 
 type OperationRouter struct {
-	transactionService OperationService
+	transactionService service.OperationService
 }
 
-func NewOperationRouter(transactionService OperationService) *OperationRouter {
+func NewOperationRouter(transactionService service.OperationService) *OperationRouter {
 	return &OperationRouter{transactionService: transactionService}
 }
 

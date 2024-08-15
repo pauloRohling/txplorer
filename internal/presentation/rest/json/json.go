@@ -2,6 +2,7 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -31,6 +32,9 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) {
 }
 
 func WriteError(w http.ResponseWriter, err error) {
+	if err == nil {
+		err = fmt.Errorf("unknown error")
+	}
 	payload := Error{Code: http.StatusInternalServerError, Message: err.Error()}
 	WriteJSON(w, http.StatusInternalServerError, payload)
 }

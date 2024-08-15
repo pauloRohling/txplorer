@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistance"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/pkg/banner"
+	"github.com/pauloRohling/txplorer/pkg/crypto"
 	"github.com/pauloRohling/txplorer/pkg/env"
 	"github.com/pauloRohling/txplorer/pkg/envconfig"
 	"github.com/pauloRohling/txplorer/pkg/graceful"
@@ -45,22 +47,24 @@ func main() {
 		}
 	}(db)
 
+	passwordEncoder := crypto.NewBcryptEncoder()
 	txManager := tx.NewPostgresTxManager(db)
 
 	accountMapper := mapper.NewAccountMapper()
 	transactionMapper := mapper.NewOperationMapper()
+	userMapper := mapper.NewUserMapper()
 
 	accountRepository := persistance.NewAccountRepository(db, accountMapper)
 	transactionRepository := persistance.NewTransactionRepository(db, transactionMapper)
+	userRepository := persistance.NewUserRepository(db, userMapper)
 
-	transferAction := operation.NewTransferAction(
-		txManager,
-		accountRepository,
-		transactionRepository,
-	)
+	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
+	transferAction := operation.NewTransferAction(txManager, accountRepository, transactionRepository)
 
+	accountService := account.NewService(createAccountAction)
 	transactionService := operation.NewService(transferAction)
 
+	accountRouter := rest.NewAccountRouter(accountService)
 	transactionRouter := rest.NewOperationRouter(transactionService)
 
 	httpServer := webserver.NewWebServer(environment.Server.Port, nil)
@@ -75,6 +79,7 @@ func main() {
 		},
 	})
 
+	httpServer.AddRoute(accountRouter)
 	httpServer.AddRoute(transactionRouter)
 
 	slog.Info("Web server started listening on", "port", environment.Server.Port, "startup time", time.Since(start))

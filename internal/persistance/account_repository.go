@@ -29,7 +29,12 @@ func (repository *AccountRepository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.db)
 }
 
-func (repository *AccountRepository) Create(ctx context.Context, id uuid.UUID, userId uuid.UUID) (*model.Account, error) {
+func (repository *AccountRepository) Create(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
+	}
+
 	account, err := repository.query(ctx).InsertAccount(ctx, store.InsertAccountParams{
 		ID:     id,
 		UserID: userId,
