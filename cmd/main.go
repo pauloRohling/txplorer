@@ -61,9 +61,10 @@ func main() {
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
 	depositAction := operation.NewDepositAction(accountRepository, operationRepository, txManager)
 	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
+	withdrawAction := operation.NewWithdrawAction(accountRepository, operationRepository, txManager)
 
 	accountService := account.NewService(createAccountAction)
-	operationService := operation.NewService(depositAction, transferAction)
+	operationService := operation.NewService(depositAction, transferAction, withdrawAction)
 
 	accountRouter := rest.NewAccountRouter(accountService)
 	operationRouter := rest.NewOperationRouter(operationService)

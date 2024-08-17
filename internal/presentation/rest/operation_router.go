@@ -24,6 +24,7 @@ func (router *OperationRouter) Endpoint() string {
 func (router *OperationRouter) Route(r chi.Router) {
 	r.Post("/deposit", webserver.Endpoint(router.Deposit, http.StatusOK))
 	r.Post("/transfer", webserver.Endpoint(router.Transfer, http.StatusOK))
+	r.Post("/withdraw", webserver.Endpoint(router.Withdraw, http.StatusOK))
 }
 
 func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
@@ -42,4 +43,13 @@ func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) 
 	}
 
 	return router.operationService.Transfer(r.Context(), *input)
+}
+
+func (router *OperationRouter) Withdraw(_ http.ResponseWriter, r *http.Request) (*operation.WithdrawOutput, error) {
+	input, err := json.Parse[operation.WithdrawInput](r)
+	if err != nil {
+		return nil, err
+	}
+
+	return router.operationService.Withdraw(r.Context(), *input)
 }
