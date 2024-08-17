@@ -51,21 +51,22 @@ func main() {
 	txManager := tx.NewPostgresTxManager(db)
 
 	accountMapper := mapper.NewAccountMapper()
-	transactionMapper := mapper.NewOperationMapper()
+	operationMapper := mapper.NewOperationMapper()
 	userMapper := mapper.NewUserMapper()
 
 	accountRepository := persistance.NewAccountRepository(db, accountMapper)
-	transactionRepository := persistance.NewTransactionRepository(db, transactionMapper)
+	operationRepository := persistance.NewOperationRepository(db, operationMapper)
 	userRepository := persistance.NewUserRepository(db, userMapper)
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
-	transferAction := operation.NewTransferAction(txManager, accountRepository, transactionRepository)
+	depositAction := operation.NewDepositAction(accountRepository, operationRepository, txManager)
+	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
 
 	accountService := account.NewService(createAccountAction)
-	transactionService := operation.NewService(transferAction)
+	operationService := operation.NewService(depositAction, transferAction)
 
 	accountRouter := rest.NewAccountRouter(accountService)
-	transactionRouter := rest.NewOperationRouter(transactionService)
+	operationRouter := rest.NewOperationRouter(operationService)
 
 	httpServer := webserver.NewWebServer(environment.Server.Port, nil)
 	gracefulShutdownCtx := graceful.Shutdown(&graceful.Params{
@@ -80,7 +81,7 @@ func main() {
 	})
 
 	httpServer.AddRoute(accountRouter)
-	httpServer.AddRoute(transactionRouter)
+	httpServer.AddRoute(operationRouter)
 
 	slog.Info("Web server started listening on", "port", environment.Server.Port, "startup time", time.Since(start))
 	if err = httpServer.Start(); err != nil {

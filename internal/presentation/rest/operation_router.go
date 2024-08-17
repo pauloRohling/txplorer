@@ -10,11 +10,11 @@ import (
 )
 
 type OperationRouter struct {
-	transactionService service.OperationService
+	operationService service.OperationService
 }
 
-func NewOperationRouter(transactionService service.OperationService) *OperationRouter {
-	return &OperationRouter{transactionService: transactionService}
+func NewOperationRouter(operationService service.OperationService) *OperationRouter {
+	return &OperationRouter{operationService: operationService}
 }
 
 func (router *OperationRouter) Endpoint() string {
@@ -22,7 +22,17 @@ func (router *OperationRouter) Endpoint() string {
 }
 
 func (router *OperationRouter) Route(r chi.Router) {
+	r.Post("/deposit", webserver.Endpoint(router.Deposit, http.StatusOK))
 	r.Post("/transfer", webserver.Endpoint(router.Transfer, http.StatusOK))
+}
+
+func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
+	input, err := json.Parse[operation.DepositInput](r)
+	if err != nil {
+		return nil, err
+	}
+
+	return router.operationService.Deposit(r.Context(), *input)
 }
 
 func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
@@ -31,5 +41,5 @@ func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) 
 		return nil, err
 	}
 
-	return router.transactionService.Transfer(r.Context(), *input)
+	return router.operationService.Transfer(r.Context(), *input)
 }

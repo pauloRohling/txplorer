@@ -15,7 +15,7 @@ type OperationRepository struct {
 	operationMapper mapper.OperationMapper
 }
 
-func NewTransactionRepository(db *sql.DB, operationMapper mapper.OperationMapper) *OperationRepository {
+func NewOperationRepository(db *sql.DB, operationMapper mapper.OperationMapper) *OperationRepository {
 	return &OperationRepository{
 		db:              db,
 		operationMapper: operationMapper,

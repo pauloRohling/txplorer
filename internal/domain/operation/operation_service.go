@@ -5,11 +5,19 @@ import (
 )
 
 type Service struct {
+	depositAction  *DepositAction
 	transferAction *TransferAction
 }
 
-func NewService(transferAction *TransferAction) *Service {
-	return &Service{transferAction: transferAction}
+func NewService(depositAction *DepositAction, transferAction *TransferAction) *Service {
+	return &Service{
+		depositAction:  depositAction,
+		transferAction: transferAction,
+	}
+}
+
+func (service *Service) Deposit(ctx context.Context, input DepositInput) (*DepositOutput, error) {
+	return service.depositAction.Execute(ctx, input)
 }
 
 func (service *Service) Transfer(ctx context.Context, input TransferInput) (*TransferOutput, error) {

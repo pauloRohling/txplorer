@@ -30,9 +30,9 @@ func (suite *TransferActionSuite) SetupTest() {
 	suite.accountRepository = mockrepository.NewMockAccountRepository(t)
 	suite.operationRepository = mockrepository.NewMockOperationRepository(t)
 	suite.action = NewTransferAction(
-		suite.transactionManager,
 		suite.accountRepository,
 		suite.operationRepository,
+		suite.transactionManager,
 	)
 }
 

@@ -6,15 +6,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/domain/repository"
 	"github.com/pauloRohling/txplorer/internal/model"
-	tx "github.com/pauloRohling/txplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/pkg/transaction"
 	"time"
 )
 
 type TransferInput struct {
 	FromAccountID uuid.UUID `json:"fromAccountId"`
 	ToAccountID   uuid.UUID `json:"toAccountId"`
-	Amount        int64     `json:"amount"`
 	RequesterID   uuid.UUID `json:"requesterId"`
+	Amount        int64     `json:"amount"`
 }
 
 type TransferOutput struct {
@@ -22,20 +22,16 @@ type TransferOutput struct {
 }
 
 type TransferAction struct {
-	transactionManager  tx.Manager
 	accountRepository   repository.AccountRepository
 	operationRepository repository.OperationRepository
+	transactionManager  transaction.Manager
 }
 
-func NewTransferAction(
-	transactionManager tx.Manager,
-	accountRepository repository.AccountRepository,
-	operationRepository repository.OperationRepository,
-) *TransferAction {
+func NewTransferAction(accountRepository repository.AccountRepository, operationRepository repository.OperationRepository, transactionManager transaction.Manager) *TransferAction {
 	return &TransferAction{
-		transactionManager:  transactionManager,
 		accountRepository:   accountRepository,
 		operationRepository: operationRepository,
+		transactionManager:  transactionManager,
 	}
 }
 
