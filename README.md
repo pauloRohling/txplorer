@@ -45,26 +45,6 @@ the business logic, while the persistence layer handles the transactional aspect
 
 ## Environment Variables
 
-type Environment struct {
-Server struct {
-Port int32 `yml:"port" envconfig:"SERVER_PORT"`
-} `yml:"server"`
-Database struct {
-Host string `yml:"host" envconfig:"DATABASE_HOST"`
-Port int32  `yml:"port" envconfig:"DATABASE_PORT"`
-Name string `yml:"name" envconfig:"DATABASE_NAME"`
-User string `yml:"user" envconfig:"DATABASE_USER"`
-Password string `yml:"password" envconfig:"DATABASE_PASSWORD"`
-SSL bool   `yml:"ssl" envconfig:"DATABASE_SSL"`
-Pool struct {
-MaxOpenConns int           `yml:"max-open-conns" envconfig:"DATABASE_MAX_OPEN_CONNS"`
-MaxIdleConns int           `yml:"max-idle-conns" envconfig:"DATABASE_MAX_IDLE_CONNS"`
-ConnMaxLifetime time.Duration `yml:"conn-max-lifetime" envconfig:"DATABASE_CONN_MAX_LIFETIME"`
-ConnMaxIdleTime time.Duration `yml:"conn-max-idle-time" envconfig:"DATABASE_CONN_MAX_IDLE_TIME"`
-}
-} `yml:"database"`
-}
-
 | Variable                      | Description                         | Default Value | Required |
 |-------------------------------|-------------------------------------|---------------|----------|
 | `SERVER_PORT`                 | Port to listen on                   | 8080          | false    |
