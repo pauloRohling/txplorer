@@ -84,9 +84,9 @@ func (_c *MockAccountRepository_AddBalanceById_Call) RunAndReturn(run func(conte
 	return _c
 }
 
-// Create provides a mock function with given fields: ctx, id, userId
-func (_m *MockAccountRepository) Create(ctx context.Context, id uuid.UUID, userId uuid.UUID) (*model.Account, error) {
-	ret := _m.Called(ctx, id, userId)
+// Create provides a mock function with given fields: ctx, userId
+func (_m *MockAccountRepository) Create(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+	ret := _m.Called(ctx, userId)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -94,19 +94,19 @@ func (_m *MockAccountRepository) Create(ctx context.Context, id uuid.UUID, userI
 
 	var r0 *model.Account
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.Account, error)); ok {
-		return rf(ctx, id, userId)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.Account, error)); ok {
+		return rf(ctx, userId)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.Account); ok {
-		r0 = rf(ctx, id, userId)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.Account); ok {
+		r0 = rf(ctx, userId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Account)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(ctx, id, userId)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, userId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -121,15 +121,14 @@ type MockAccountRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - id uuid.UUID
 //   - userId uuid.UUID
-func (_e *MockAccountRepository_Expecter) Create(ctx interface{}, id interface{}, userId interface{}) *MockAccountRepository_Create_Call {
-	return &MockAccountRepository_Create_Call{Call: _e.mock.On("Create", ctx, id, userId)}
+func (_e *MockAccountRepository_Expecter) Create(ctx interface{}, userId interface{}) *MockAccountRepository_Create_Call {
+	return &MockAccountRepository_Create_Call{Call: _e.mock.On("Create", ctx, userId)}
 }
 
-func (_c *MockAccountRepository_Create_Call) Run(run func(ctx context.Context, id uuid.UUID, userId uuid.UUID)) *MockAccountRepository_Create_Call {
+func (_c *MockAccountRepository_Create_Call) Run(run func(ctx context.Context, userId uuid.UUID)) *MockAccountRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})
 	return _c
 }
@@ -139,7 +138,7 @@ func (_c *MockAccountRepository_Create_Call) Return(_a0 *model.Account, _a1 erro
 	return _c
 }
 
-func (_c *MockAccountRepository_Create_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (*model.Account, error)) *MockAccountRepository_Create_Call {
+func (_c *MockAccountRepository_Create_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*model.Account, error)) *MockAccountRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }

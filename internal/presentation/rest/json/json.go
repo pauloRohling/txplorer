@@ -2,15 +2,12 @@ package json
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
+	"github.com/pauloRohling/txplorer/internal/model"
 	"io"
+	"log/slog"
 	"net/http"
 )
-
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
 
 func Parse[T any](r *http.Request) (*T, error) {
 	defer func(Body io.ReadCloser) { _ = Body.Close() }(r.Body)
@@ -19,6 +16,7 @@ func Parse[T any](r *http.Request) (*T, error) {
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		return nil, err
 	}
+
 	return &input, nil
 }
 
@@ -33,8 +31,22 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) {
 
 func WriteError(w http.ResponseWriter, err error) {
 	if err == nil {
-		err = fmt.Errorf("unknown error")
+		err = model.InternalError("")
 	}
-	payload := Error{Code: http.StatusInternalServerError, Message: err.Error()}
-	WriteJSON(w, http.StatusInternalServerError, payload)
+
+	var customErr model.Error
+	if !errors.As(err, &customErr) {
+		customErr = model.InternalError(err.Error())
+	}
+
+	if customErr.Err == nil {
+		slog.Error(customErr.Error())
+	} else {
+		slog.Error(customErr.Error(), "description", customErr.Err.Error())
+	}
+
+	slog.Error(customErr.StackTrace)
+
+	response := NewResponseFromError(customErr)
+	WriteJSON(w, response.Status, response)
 }

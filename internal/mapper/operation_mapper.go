@@ -21,6 +21,6 @@ func (mapper *OperationMapper) ToModel(operation store.Operation) *model.Operati
 		Type:          operation.Type,
 		CreatedAt:     operation.CreatedAt,
 		CreatedBy:     operation.CreatedBy,
-		Status:        operation.Status,
+		Status:        model.OperationStatus(operation.Status),
 	}
 }

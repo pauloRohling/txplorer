@@ -41,16 +41,16 @@ func NewTransferAction(
 
 func (action *TransferAction) Execute(ctx context.Context, input TransferInput) (*TransferOutput, error) {
 	if input.FromAccountID == input.ToAccountID {
-		return nil, fmt.Errorf("[TransferAction] cannot transfer to the same account: %s", input.ToAccountID)
+		return nil, model.ValidationError("Cannot transfer to the same account")
 	}
 
 	if input.Amount <= 0 {
-		return nil, fmt.Errorf("[TransferAction] invalid amount: %d", input.Amount)
+		return nil, model.ValidationError("Invalid amount")
 	}
 
 	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to generate operation id: %w", err)
+		return nil, model.InternalError("Failed to generate operation id", err)
 	}
 
 	transferOperation := &model.Operation{
@@ -61,12 +61,12 @@ func (action *TransferAction) Execute(ctx context.Context, input TransferInput) 
 		Type:          model.OperationTypeTransfer.String(),
 		CreatedAt:     time.Now().UTC(),
 		CreatedBy:     input.RequesterID,
-		Status:        model.OperationStatusPending.String(),
+		Status:        model.OperationStatusPending,
 	}
 
 	operation, err := action.operationRepository.Create(ctx, transferOperation)
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to create operation: %w", err)
+		return nil, err
 	}
 
 	err = action.transactionManager.RunTransaction(ctx, func(ctx context.Context) error {
@@ -77,7 +77,7 @@ func (action *TransferAction) Execute(ctx context.Context, input TransferInput) 
 	if err != nil {
 		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusFailed)
 		if errOperation != nil {
-			return nil, fmt.Errorf("[TransferAction] failed to update operation %s status to FAILED: %w", operationId, errOperation)
+			return nil, model.InternalError("Failed to update operation status to FAILED", errOperation)
 		}
 		return nil, err
 	}
@@ -90,25 +90,25 @@ func (action *TransferAction) Execute(ctx context.Context, input TransferInput) 
 func (action *TransferAction) updateBalances(ctx context.Context, input TransferInput, operationId uuid.UUID) (*model.Operation, error) {
 	fromAccount, err := action.accountRepository.AddBalanceById(ctx, input.FromAccountID, input.Amount*-1)
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to update account %s balance: %w", input.FromAccountID, err)
+		return nil, model.InternalError(fmt.Sprintf("Failed to update account %s balance", input.FromAccountID), err)
 	}
 
 	if fromAccount.Balance < 0 {
-		return nil, fmt.Errorf("[TransferAction] account %s balance is negative: %d", input.FromAccountID, fromAccount.Balance)
+		return nil, model.ValidationError(fmt.Sprintf("Account %s balance is negative", input.FromAccountID))
 	}
 
 	toAccount, err := action.accountRepository.AddBalanceById(ctx, input.ToAccountID, input.Amount)
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to update account %s balance: %w", input.ToAccountID, err)
+		return nil, model.InternalError(fmt.Sprintf("Failed to update account %s balance", input.ToAccountID), err)
 	}
 
 	if toAccount.Balance < 0 {
-		return nil, fmt.Errorf("[TransferAction] account %s balance is negative: %d", input.ToAccountID, toAccount.Balance)
+		return nil, model.ValidationError(fmt.Sprintf("Account %s balance is negative", input.ToAccountID))
 	}
 
 	operation, err := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusSuccess)
 	if err != nil {
-		return nil, fmt.Errorf("[TransferAction] failed to update operation %s status to SUCCESS: %w", operationId, err)
+		return nil, model.InternalError("Failed to update operation status to SUCCESS", err)
 	}
 
 	return operation, nil
