@@ -5,4 +5,5 @@ const (
 	ApiVersion    = "/v1"
 	AccountsApi   = ApiPrefix + ApiVersion + "/accounts"
 	OperationsApi = ApiPrefix + ApiVersion + "/operations"
+	UsersApi      = ApiPrefix + ApiVersion + "/users"
 )

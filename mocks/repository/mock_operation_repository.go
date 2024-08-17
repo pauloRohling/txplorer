@@ -29,7 +29,7 @@ func (_m *MockOperationRepository) Create(ctx context.Context, entity *model.Ope
 	ret := _m.Called(ctx, entity)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Create")
+		panic("no return value specified for Login")
 	}
 
 	var r0 *model.Operation
@@ -54,7 +54,7 @@ func (_m *MockOperationRepository) Create(ctx context.Context, entity *model.Ope
 	return r0, r1
 }
 
-// MockOperationRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+// MockOperationRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
 type MockOperationRepository_Create_Call struct {
 	*mock.Call
 }
@@ -63,7 +63,7 @@ type MockOperationRepository_Create_Call struct {
 //   - ctx context.Context
 //   - entity *model.Operation
 func (_e *MockOperationRepository_Expecter) Create(ctx interface{}, entity interface{}) *MockOperationRepository_Create_Call {
-	return &MockOperationRepository_Create_Call{Call: _e.mock.On("Create", ctx, entity)}
+	return &MockOperationRepository_Create_Call{Call: _e.mock.On("Login", ctx, entity)}
 }
 
 func (_c *MockOperationRepository_Create_Call) Run(run func(ctx context.Context, entity *model.Operation)) *MockOperationRepository_Create_Call {

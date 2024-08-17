@@ -7,9 +7,11 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
+	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"github.com/pauloRohling/txplorer/internal/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistance"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest"
+	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/pkg/banner"
 	"github.com/pauloRohling/txplorer/pkg/crypto"
@@ -47,7 +49,10 @@ func main() {
 		}
 	}(db)
 
+	secretHolder := presentation.NewJwtSecretHolder("secret")
+	passwordComparator := crypto.NewBcryptComparator()
 	passwordEncoder := crypto.NewBcryptEncoder()
+	tokenGenerator := presentation.NewJwtGenerator(secretHolder)
 	txManager := tx.NewPostgresTxManager(db)
 
 	accountMapper := mapper.NewAccountMapper()
@@ -60,14 +65,17 @@ func main() {
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
 	depositAction := operation.NewDepositAction(accountRepository, operationRepository, txManager)
+	loginAction := user.NewLoginAction(userRepository, passwordComparator, tokenGenerator)
 	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
 	withdrawAction := operation.NewWithdrawAction(accountRepository, operationRepository, txManager)
 
 	accountService := account.NewService(createAccountAction)
 	operationService := operation.NewService(depositAction, transferAction, withdrawAction)
+	userService := user.NewService(loginAction)
 
 	accountRouter := rest.NewAccountRouter(accountService)
 	operationRouter := rest.NewOperationRouter(operationService)
+	userRouter := rest.NewUserRouter(userService)
 
 	httpServer := webserver.NewWebServer(environment.Server.Port, nil)
 	gracefulShutdownCtx := graceful.Shutdown(&graceful.Params{
@@ -83,6 +91,7 @@ func main() {
 
 	httpServer.AddRoute(accountRouter)
 	httpServer.AddRoute(operationRouter)
+	httpServer.AddRoute(userRouter)
 
 	slog.Info("Web server started listening on", "port", environment.Server.Port, "startup time", time.Since(start))
 	if err = httpServer.Start(); err != nil {

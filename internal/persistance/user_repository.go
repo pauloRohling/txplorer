@@ -48,3 +48,12 @@ func (repository *UserRepository) Create(ctx context.Context, name string, email
 
 	return repository.userMapper.ToModel(user), nil
 }
+
+func (repository *UserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+	user, err := repository.query(ctx).FindUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.userMapper.ToModel(user), nil
+}

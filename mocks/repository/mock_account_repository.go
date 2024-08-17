@@ -89,7 +89,7 @@ func (_m *MockAccountRepository) Create(ctx context.Context, userId uuid.UUID) (
 	ret := _m.Called(ctx, userId)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Create")
+		panic("no return value specified for Login")
 	}
 
 	var r0 *model.Account
@@ -114,7 +114,7 @@ func (_m *MockAccountRepository) Create(ctx context.Context, userId uuid.UUID) (
 	return r0, r1
 }
 
-// MockAccountRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+// MockAccountRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
 type MockAccountRepository_Create_Call struct {
 	*mock.Call
 }
@@ -123,7 +123,7 @@ type MockAccountRepository_Create_Call struct {
 //   - ctx context.Context
 //   - userId uuid.UUID
 func (_e *MockAccountRepository_Expecter) Create(ctx interface{}, userId interface{}) *MockAccountRepository_Create_Call {
-	return &MockAccountRepository_Create_Call{Call: _e.mock.On("Create", ctx, userId)}
+	return &MockAccountRepository_Create_Call{Call: _e.mock.On("Login", ctx, userId)}
 }
 
 func (_c *MockAccountRepository_Create_Call) Run(run func(ctx context.Context, userId uuid.UUID)) *MockAccountRepository_Create_Call {
