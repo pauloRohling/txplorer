@@ -11,9 +11,8 @@ import (
 )
 
 type LoginInput struct {
-	Email           string `json:"email"`
-	Password        string `json:"password"`
-	TokenExpiration int64  `json:"-"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type LoginOutput struct {
@@ -24,13 +23,15 @@ type LoginAction struct {
 	userRepository     repository.UserRepository
 	passwordComparator password.Comparator
 	tokenGenerator     token.Generator
+	tokenExpiration    time.Duration
 }
 
-func NewLoginAction(userRepository repository.UserRepository, passwordComparator password.Comparator, tokenGenerator token.Generator) *LoginAction {
+func NewLoginAction(userRepository repository.UserRepository, passwordComparator password.Comparator, tokenGenerator token.Generator, tokenExpiration time.Duration) *LoginAction {
 	return &LoginAction{
 		userRepository:     userRepository,
 		passwordComparator: passwordComparator,
 		tokenGenerator:     tokenGenerator,
+		tokenExpiration:    tokenExpiration,
 	}
 }
 
@@ -44,7 +45,7 @@ func (action *LoginAction) Execute(ctx context.Context, input LoginInput) (*Logi
 		return nil, model.UnauthorizedError("Invalid credentials")
 	}
 
-	claims := action.generateClaims(user.ID, input.TokenExpiration)
+	claims := action.generateClaims(user.ID)
 
 	var accessToken string
 	accessToken, err = action.tokenGenerator.Generate(claims)
@@ -59,9 +60,9 @@ func (action *LoginAction) fromToken(accessToken string) *LoginOutput {
 	return &LoginOutput{AccessToken: accessToken}
 }
 
-func (action *LoginAction) generateClaims(userId uuid.UUID, tokenExpiration int64) map[string]any {
+func (action *LoginAction) generateClaims(userId uuid.UUID) map[string]any {
 	return map[string]any{
 		"sub": userId.String(),
-		"exp": time.Now().UTC().Add(time.Second * time.Duration(tokenExpiration)).Unix(),
+		"exp": time.Now().UTC().Add(action.tokenExpiration).Unix(),
 	}
 }

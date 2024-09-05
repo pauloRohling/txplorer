@@ -48,6 +48,8 @@ the business logic, while the persistence layer handles the transactional aspect
 | Variable                      | Description                         | Default Value | Required |
 |-------------------------------|-------------------------------------|---------------|----------|
 | `SERVER_PORT`                 | Port to listen on                   | 8080          | false    |
+| `SECURITY_SECRET`             | Secret used to sign JWT tokens      | -             | true     |
+| `SECURITY_TOKEN_EXPIRATION`   | Expiration time of JWT tokens       | 24h           | false    |
 | `DATABASE_HOST`               | Host of the database                | -             | true     |
 | `DATABASE_PORT`               | Port of the database                | -             | true     |
 | `DATABASE_NAME`               | Name of the database                | -             | true     |

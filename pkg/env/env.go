@@ -7,25 +7,26 @@ import (
 
 type Environment struct {
 	Server struct {
-		Port int32 `yml:"port" envconfig:"SERVER_PORT"`
-	} `yml:"server"`
+		Port int32 `yaml:"port" envconfig:"SERVER_PORT"`
+	} `yaml:"server"`
 	Security struct {
-		Secret string `yml:"secret" envconfig:"SECURITY_SECRET"`
-	}
+		Secret          string        `yaml:"secret" envconfig:"SECURITY_SECRET"`
+		TokenExpiration time.Duration `yaml:"token-expiration" envconfig:"SECURITY_TOKEN_EXPIRATION"`
+	} `yaml:"security"`
 	Database struct {
-		Host     string `yml:"host" envconfig:"DATABASE_HOST"`
-		Port     int32  `yml:"port" envconfig:"DATABASE_PORT"`
-		Name     string `yml:"name" envconfig:"DATABASE_NAME"`
-		User     string `yml:"user" envconfig:"DATABASE_USER"`
-		Password string `yml:"password" envconfig:"DATABASE_PASSWORD"`
-		SSL      bool   `yml:"ssl" envconfig:"DATABASE_SSL"`
+		Host     string `yaml:"host" envconfig:"DATABASE_HOST"`
+		Port     int32  `yaml:"port" envconfig:"DATABASE_PORT"`
+		Name     string `yaml:"name" envconfig:"DATABASE_NAME"`
+		User     string `yaml:"user" envconfig:"DATABASE_USER"`
+		Password string `yaml:"password" envconfig:"DATABASE_PASSWORD"`
+		SSL      bool   `yaml:"ssl" envconfig:"DATABASE_SSL"`
 		Pool     struct {
-			MaxOpenConns    int           `yml:"max-open-conns" envconfig:"DATABASE_MAX_OPEN_CONNS"`
-			MaxIdleConns    int           `yml:"max-idle-conns" envconfig:"DATABASE_MAX_IDLE_CONNS"`
-			ConnMaxLifetime time.Duration `yml:"conn-max-lifetime" envconfig:"DATABASE_CONN_MAX_LIFETIME"`
-			ConnMaxIdleTime time.Duration `yml:"conn-max-idle-time" envconfig:"DATABASE_CONN_MAX_IDLE_TIME"`
+			MaxOpenConns    int           `yaml:"max-open-conns" envconfig:"DATABASE_MAX_OPEN_CONNS"`
+			MaxIdleConns    int           `yaml:"max-idle-conns" envconfig:"DATABASE_MAX_IDLE_CONNS"`
+			ConnMaxLifetime time.Duration `yaml:"conn-max-lifetime" envconfig:"DATABASE_CONN_MAX_LIFETIME"`
+			ConnMaxIdleTime time.Duration `yaml:"conn-max-idle-time" envconfig:"DATABASE_CONN_MAX_IDLE_TIME"`
 		}
-	} `yml:"database"`
+	} `yaml:"database"`
 }
 
 func (env *Environment) Validate() error {
@@ -51,6 +52,10 @@ func (env *Environment) Validate() error {
 
 	if env.Security.Secret == "" {
 		return errors.New("security secret is required")
+	}
+
+	if env.Security.TokenExpiration == 0 {
+		env.Security.TokenExpiration = time.Hour * 24
 	}
 
 	if env.Server.Port == 0 {

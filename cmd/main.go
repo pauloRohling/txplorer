@@ -65,7 +65,7 @@ func main() {
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
 	depositAction := operation.NewDepositAction(accountRepository, operationRepository, txManager)
-	loginAction := user.NewLoginAction(userRepository, passwordComparator, tokenGenerator)
+	loginAction := user.NewLoginAction(userRepository, passwordComparator, tokenGenerator, environment.Security.TokenExpiration)
 	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
 	withdrawAction := operation.NewWithdrawAction(accountRepository, operationRepository, txManager)
 

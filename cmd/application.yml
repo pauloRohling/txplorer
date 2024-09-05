@@ -1,12 +1,15 @@
 server:
   port: 8080
 
+security:
+  token-expiration: 24h
+
 database:
   port: 5432
   name: txplorer
   ssl: false
   pool:
-    maxOpenConns: 100
-    maxIdleConns: 10
-    connMaxLifetime: 5m
-    connMaxIdleTime: 30s
+    max-open-conns: 100
+    max-idle-conns: 10
+    conn-max-lifetime: 5m
+    conn-max-idle-time: 30s
