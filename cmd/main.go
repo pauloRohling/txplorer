@@ -74,7 +74,7 @@ func main() {
 	userService := user.NewService(loginAction)
 
 	accountRouter := rest.NewAccountRouter(accountService)
-	operationRouter := rest.NewOperationRouter(operationService)
+	operationRouter := rest.NewOperationRouter(operationService, secretHolder)
 	userRouter := rest.NewUserRouter(userService)
 
 	httpServer := webserver.NewWebServer(environment.Server.Port, nil)

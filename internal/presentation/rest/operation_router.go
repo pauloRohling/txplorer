@@ -3,7 +3,9 @@ package rest
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
+	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
+	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
@@ -11,10 +13,11 @@ import (
 
 type OperationRouter struct {
 	operationService service.OperationService
+	secretHolder     presentation.SecretHolder
 }
 
-func NewOperationRouter(operationService service.OperationService) *OperationRouter {
-	return &OperationRouter{operationService: operationService}
+func NewOperationRouter(operationService service.OperationService, secretHolder presentation.SecretHolder) *OperationRouter {
+	return &OperationRouter{operationService: operationService, secretHolder: secretHolder}
 }
 
 func (router *OperationRouter) Endpoint() string {
@@ -22,6 +25,7 @@ func (router *OperationRouter) Endpoint() string {
 }
 
 func (router *OperationRouter) Route(r chi.Router) {
+	r.Use(middleware.Authenticator(router.secretHolder.Get()))
 	r.Post("/deposit", webserver.Endpoint(router.Deposit, http.StatusOK))
 	r.Post("/transfer", webserver.Endpoint(router.Transfer, http.StatusOK))
 	r.Post("/withdraw", webserver.Endpoint(router.Withdraw, http.StatusOK))
