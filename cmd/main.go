@@ -49,7 +49,7 @@ func main() {
 		}
 	}(db)
 
-	secretHolder := presentation.NewJwtSecretHolder("secret")
+	secretHolder := presentation.NewJwtSecretHolder(environment.Security.Secret)
 	passwordComparator := crypto.NewBcryptComparator()
 	passwordEncoder := crypto.NewBcryptEncoder()
 	tokenGenerator := presentation.NewJwtGenerator(secretHolder)

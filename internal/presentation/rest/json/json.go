@@ -31,7 +31,7 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) {
 
 func WriteError(w http.ResponseWriter, err error) {
 	if err == nil {
-		err = model.InternalError("")
+		err = model.InternalError("Empty error")
 	}
 
 	var customErr model.Error

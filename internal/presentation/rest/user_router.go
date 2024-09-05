@@ -22,7 +22,7 @@ func (router *UserRouter) Endpoint() string {
 }
 
 func (router *UserRouter) Route(r chi.Router) {
-	r.Post("/", webserver.Endpoint(router.Login, http.StatusOK))
+	r.Post("/login", webserver.Endpoint(router.Login, http.StatusOK))
 }
 
 func (router *UserRouter) Login(_ http.ResponseWriter, r *http.Request) (*user.LoginOutput, error) {

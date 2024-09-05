@@ -9,6 +9,9 @@ type Environment struct {
 	Server struct {
 		Port int32 `yml:"port" envconfig:"SERVER_PORT"`
 	} `yml:"server"`
+	Security struct {
+		Secret string `yml:"secret" envconfig:"SECURITY_SECRET"`
+	}
 	Database struct {
 		Host     string `yml:"host" envconfig:"DATABASE_HOST"`
 		Port     int32  `yml:"port" envconfig:"DATABASE_PORT"`
@@ -44,6 +47,10 @@ func (env *Environment) Validate() error {
 
 	if env.Database.Password == "" {
 		return errors.New("database password is required")
+	}
+
+	if env.Security.Secret == "" {
+		return errors.New("security secret is required")
 	}
 
 	if env.Server.Port == 0 {
