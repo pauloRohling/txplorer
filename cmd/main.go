@@ -40,7 +40,7 @@ func main() {
 
 	db, err := getDatabaseConnection()
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("Could not get database connection", "error", err.Error())
 		os.Exit(-1)
 	}
 	defer func(db *sql.DB) {

@@ -10,6 +10,13 @@ help:
 	@echo 'Usage:'
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
+## container: create a container for the service
+.PHONY: container
+container:
+	-docker rmi txplorer
+	docker build -t txplorer .
+	docker run --rm -p 8080:8080 -e DATABASE_HOST=host.docker.internal txplorer
+
 ## install: install all dependencies
 .PHONY: install
 install:
