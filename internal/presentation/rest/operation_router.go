@@ -2,6 +2,7 @@ package rest
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
@@ -25,34 +26,70 @@ func (router *OperationRouter) Endpoint() string {
 }
 
 func (router *OperationRouter) Route(r chi.Router) {
-	r.Use(middleware.Authenticator(router.secretHolder.Get()))
+	secret := router.secretHolder.Get()
+	r.Use(jwtauth.Verifier(secret))
+	r.Use(middleware.Authenticator(secret))
 	r.Post("/deposit", webserver.Endpoint(router.Deposit, http.StatusOK))
 	r.Post("/transfer", webserver.Endpoint(router.Transfer, http.StatusOK))
 	r.Post("/withdraw", webserver.Endpoint(router.Withdraw, http.StatusOK))
 }
 
 func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
-	input, err := json.Parse[operation.DepositInput](r)
+	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
+	}
+
+	jsonInput, err := json.Parse[DepositInput](r)
+	if err != nil {
+		return nil, err
+	}
+
+	input := &operation.DepositInput{
+		AccountID:   jsonInput.AccountID,
+		RequesterID: userId,
+		Amount:      jsonInput.Amount,
 	}
 
 	return router.operationService.Deposit(r.Context(), *input)
 }
 
 func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
-	input, err := json.Parse[operation.TransferInput](r)
+	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
+	}
+
+	jsonInput, err := json.Parse[TransferInput](r)
+	if err != nil {
+		return nil, err
+	}
+
+	input := &operation.TransferInput{
+		FromAccountID: jsonInput.FromAccountID,
+		ToAccountID:   jsonInput.ToAccountID,
+		RequesterID:   userId,
+		Amount:        jsonInput.Amount,
 	}
 
 	return router.operationService.Transfer(r.Context(), *input)
 }
 
 func (router *OperationRouter) Withdraw(_ http.ResponseWriter, r *http.Request) (*operation.WithdrawOutput, error) {
-	input, err := json.Parse[operation.WithdrawInput](r)
+	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
+	}
+
+	jsonInput, err := json.Parse[WithdrawInput](r)
+	if err != nil {
+		return nil, err
+	}
+
+	input := &operation.WithdrawInput{
+		AccountID:   jsonInput.AccountID,
+		RequesterID: userId,
+		Amount:      jsonInput.Amount,
 	}
 
 	return router.operationService.Withdraw(r.Context(), *input)

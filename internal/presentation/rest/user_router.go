@@ -26,9 +26,14 @@ func (router *UserRouter) Route(r chi.Router) {
 }
 
 func (router *UserRouter) Login(_ http.ResponseWriter, r *http.Request) (*user.LoginOutput, error) {
-	input, err := json.Parse[user.LoginInput](r)
+	jsonInput, err := json.Parse[LoginInput](r)
 	if err != nil {
 		return nil, err
+	}
+
+	input := &user.LoginInput{
+		Email:    jsonInput.Email,
+		Password: jsonInput.Password,
 	}
 
 	return router.userService.Login(r.Context(), *input)

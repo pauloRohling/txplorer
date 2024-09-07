@@ -56,3 +56,11 @@ func createAuthContext(ctx context.Context, claims Claims) (context.Context, err
 	ctx = context.WithValue(ctx, UserIdContextKey, userId)
 	return ctx, nil
 }
+
+func GetUserId(ctx context.Context) (uuid.UUID, error) {
+	userId, ok := ctx.Value(UserIdContextKey).(uuid.UUID)
+	if !ok {
+		return uuid.UUID{}, model.UnauthorizedError("could not get 'userId' from context")
+	}
+	return userId, nil
+}

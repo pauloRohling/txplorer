@@ -143,6 +143,65 @@ func (_c *MockAccountRepository_Create_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// GetById provides a mock function with given fields: ctx, id
+func (_m *MockAccountRepository) GetById(ctx context.Context, id uuid.UUID) (*model.Account, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetById")
+	}
+
+	var r0 *model.Account
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.Account, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.Account); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Account)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockAccountRepository_GetById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetById'
+type MockAccountRepository_GetById_Call struct {
+	*mock.Call
+}
+
+// GetById is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *MockAccountRepository_Expecter) GetById(ctx interface{}, id interface{}) *MockAccountRepository_GetById_Call {
+	return &MockAccountRepository_GetById_Call{Call: _e.mock.On("GetById", ctx, id)}
+}
+
+func (_c *MockAccountRepository_GetById_Call) Run(run func(ctx context.Context, id uuid.UUID)) *MockAccountRepository_GetById_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_GetById_Call) Return(_a0 *model.Account, _a1 error) *MockAccountRepository_GetById_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockAccountRepository_GetById_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*model.Account, error)) *MockAccountRepository_GetById_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockAccountRepository creates a new instance of MockAccountRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockAccountRepository(t interface {

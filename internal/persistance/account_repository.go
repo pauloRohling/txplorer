@@ -59,3 +59,12 @@ func (repository *AccountRepository) AddBalanceById(ctx context.Context, id uuid
 
 	return repository.accountMapper.ToModel(account), nil
 }
+
+func (repository *AccountRepository) GetById(ctx context.Context, id uuid.UUID) (*model.Account, error) {
+	account, err := repository.query(ctx).GetAccountById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.accountMapper.ToModel(account), nil
+}

@@ -38,6 +38,15 @@ func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) 
 		return nil, model.ValidationError("Amount must be greater than 0 to make a withdrawal")
 	}
 
+	account, err := action.accountRepository.GetById(ctx, input.AccountID)
+	if err != nil {
+		return nil, model.InternalError("Failed to get account", err)
+	}
+
+	if account.UserID != input.RequesterID {
+		return nil, model.UnauthorizedError("You are not authorized to make this withdrawal")
+	}
+
 	operationId, err := uuid.NewV7()
 	if err != nil {
 		return nil, model.InternalError("Failed to generate operation id", err)

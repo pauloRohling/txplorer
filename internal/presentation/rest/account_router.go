@@ -26,9 +26,15 @@ func (router *AccountRouter) Route(r chi.Router) {
 }
 
 func (router *AccountRouter) Create(_ http.ResponseWriter, r *http.Request) (*account.CreateAccountOutput, error) {
-	input, err := json.Parse[account.CreateAccountInput](r)
+	jsonInput, err := json.Parse[CreateAccountInput](r)
 	if err != nil {
 		return nil, err
+	}
+
+	input := &account.CreateAccountInput{
+		Name:     jsonInput.Name,
+		Email:    jsonInput.Email,
+		Password: jsonInput.Password,
 	}
 
 	return router.accountService.Create(r.Context(), *input)

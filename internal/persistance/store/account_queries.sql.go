@@ -37,6 +37,26 @@ func (q *Queries) AddBalanceById(ctx context.Context, arg AddBalanceByIdParams) 
 	return i, err
 }
 
+const getAccountById = `-- name: GetAccountById :one
+SELECT id, balance, user_id, created_at, updated_at, status
+FROM accounts
+WHERE id = $1
+`
+
+func (q *Queries) GetAccountById(ctx context.Context, id uuid.UUID) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccountById, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Balance,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Status,
+	)
+	return i, err
+}
+
 const insertAccount = `-- name: InsertAccount :one
 INSERT INTO accounts (id, user_id)
 VALUES ($1, $2)
