@@ -1,4 +1,4 @@
-package rest
+package types
 
 type LoginInput struct {
 	Email    string `json:"email"`

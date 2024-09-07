@@ -1,9 +1,10 @@
-package rest
+package router
 
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
+	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
@@ -26,7 +27,7 @@ func (router *AccountRouter) Route(r chi.Router) {
 }
 
 func (router *AccountRouter) Create(_ http.ResponseWriter, r *http.Request) (*account.CreateAccountOutput, error) {
-	jsonInput, err := json.Parse[CreateAccountInput](r)
+	jsonInput, err := json.Parse[types.CreateAccountInput](r)
 	if err != nil {
 		return nil, err
 	}

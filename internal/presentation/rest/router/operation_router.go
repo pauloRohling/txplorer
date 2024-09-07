@@ -1,4 +1,4 @@
-package rest
+package router
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -7,6 +7,7 @@ import (
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
+	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
@@ -40,7 +41,7 @@ func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[DepositInput](r)
+	jsonInput, err := json.Parse[types.DepositInput](r)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) 
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[TransferInput](r)
+	jsonInput, err := json.Parse[types.TransferInput](r)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +82,7 @@ func (router *OperationRouter) Withdraw(_ http.ResponseWriter, r *http.Request) 
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[WithdrawInput](r)
+	jsonInput, err := json.Parse[types.WithdrawInput](r)
 	if err != nil {
 		return nil, err
 	}

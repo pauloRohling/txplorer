@@ -10,8 +10,8 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"github.com/pauloRohling/txplorer/internal/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistance"
-	"github.com/pauloRohling/txplorer/internal/presentation/rest"
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
+	"github.com/pauloRohling/txplorer/internal/presentation/rest/router"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/pkg/banner"
 	"github.com/pauloRohling/txplorer/pkg/crypto"
@@ -73,9 +73,9 @@ func main() {
 	operationService := operation.NewService(depositAction, transferAction, withdrawAction)
 	userService := user.NewService(loginAction)
 
-	accountRouter := rest.NewAccountRouter(accountService)
-	operationRouter := rest.NewOperationRouter(operationService, secretHolder)
-	userRouter := rest.NewUserRouter(userService)
+	accountRouter := router.NewAccountRouter(accountService)
+	operationRouter := router.NewOperationRouter(operationService, secretHolder)
+	userRouter := router.NewUserRouter(userService)
 
 	httpServer := webserver.NewWebServer(environment.Server.Port, nil)
 	gracefulShutdownCtx := graceful.Shutdown(&graceful.Params{
