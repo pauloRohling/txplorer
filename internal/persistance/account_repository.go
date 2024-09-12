@@ -68,3 +68,12 @@ func (repository *AccountRepository) GetById(ctx context.Context, id uuid.UUID) 
 
 	return repository.accountMapper.ToModel(account), nil
 }
+
+func (repository *AccountRepository) GetByUserId(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+	account, err := repository.query(ctx).GetAccountByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.accountMapper.ToModel(account), nil
+}

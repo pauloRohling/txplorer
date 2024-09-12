@@ -13,3 +13,8 @@ RETURNING *;
 SELECT *
 FROM accounts
 WHERE id = $1;
+
+-- name: GetAccountByUserId :one
+SELECT *
+FROM accounts
+WHERE user_id = $1;

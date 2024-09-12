@@ -40,6 +40,12 @@ var (
 //	@license.name	MIT
 //	@license.url	https://github.com/pauloRohling/txplorer/blob/master/LICENSE
 
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				"Authorization: Bearer <token>"
+//	@tokenUrl					/users/login
+
 // @host		localhost:8080
 // @BasePath	/api/v1
 func main() {
@@ -77,16 +83,17 @@ func main() {
 	userRepository := persistance.NewUserRepository(db, userMapper)
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
+	getAccountAction := account.NewGetAccountAction(accountRepository)
 	depositAction := operation.NewDepositAction(accountRepository, operationRepository, txManager)
 	loginAction := user.NewLoginAction(userRepository, passwordComparator, tokenGenerator, environment.Security.TokenExpiration)
 	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
 	withdrawAction := operation.NewWithdrawAction(accountRepository, operationRepository, txManager)
 
-	accountService := account.NewService(createAccountAction)
+	accountService := account.NewService(createAccountAction, getAccountAction)
 	operationService := operation.NewService(depositAction, transferAction, withdrawAction)
 	userService := user.NewService(loginAction)
 
-	accountRouter := router.NewAccountRouter(accountService)
+	accountRouter := router.NewAccountRouter(accountService, secretHolder)
 	operationRouter := router.NewOperationRouter(operationService, secretHolder)
 	userRouter := router.NewUserRouter(userService)
 

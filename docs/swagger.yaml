@@ -15,6 +15,21 @@ definitions:
       userId:
         type: string
     type: object
+  account.GetAccountOutput:
+    properties:
+      balance:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/model.AccountStatus'
+      updatedAt:
+        type: string
+      userId:
+        type: string
+    type: object
   model.AccountStatus:
     enum:
     - ACTIVE
@@ -171,6 +186,34 @@ info:
   version: "1.0"
 paths:
   /accounts:
+    get:
+      consumes:
+      - application/json
+      description: Gets an account by User ID from token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.GetAccountOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      security:
+      - BearerAuth: []
+      summary: Get Account
+      tags:
+      - Account
     post:
       consumes:
       - application/json
@@ -201,6 +244,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/model.Error'
+      security:
+      - BearerAuth: []
       summary: Create Account
       tags:
       - Account
@@ -340,4 +385,10 @@ paths:
       summary: Login
       tags:
       - User
+securityDefinitions:
+  BearerAuth:
+    description: '"Authorization: Bearer <token>"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
