@@ -35,6 +35,19 @@ func (router *OperationRouter) Route(r chi.Router) {
 	r.Post("/withdraw", webserver.Endpoint(router.Withdraw, http.StatusOK))
 }
 
+// Deposit godoc
+//
+//	@Summary		Deposit
+//	@Description	Deposits funds to an account
+//	@Tags			Operation
+//	@Accept			json
+//	@Produce		json
+//	@Param			account	body		types.DepositInput	true	"Account"
+//	@Success		200		{object}	operation.DepositOutput
+//	@Failure		400		{object}	model.Error
+//	@Failure		401		{object}	model.Error
+//	@Failure		500		{object}	model.Error
+//	@Router			/operations/deposit [post]
 func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
@@ -55,6 +68,19 @@ func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (
 	return router.operationService.Deposit(r.Context(), *input)
 }
 
+// Transfer godoc
+//
+//	@Summary		Transfer
+//	@Description	Transfers funds from one account to another
+//	@Tags			Operation
+//	@Accept			json
+//	@Produce		json
+//	@Param			account	body		types.TransferInput	true	"Account"
+//	@Success		200		{object}	operation.TransferOutput
+//	@Failure		400		{object}	model.Error
+//	@Failure		401		{object}	model.Error
+//	@Failure		500		{object}	model.Error
+//	@Router			/operations/transfer [post]
 func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
@@ -76,6 +102,19 @@ func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) 
 	return router.operationService.Transfer(r.Context(), *input)
 }
 
+// Withdraw godoc
+//
+//	@Summary		Withdraw
+//	@Description	Withdraws funds from an account
+//	@Tags			Operation
+//	@Accept			json
+//	@Produce		json
+//	@Param			account	body		types.WithdrawInput	true	"Account"
+//	@Success		200		{object}	operation.WithdrawOutput
+//	@Failure		400		{object}	model.Error
+//	@Failure		401		{object}	model.Error
+//	@Failure		500		{object}	model.Error
+//	@Router			/operations/withdraw [post]
 func (router *OperationRouter) Withdraw(_ http.ResponseWriter, r *http.Request) (*operation.WithdrawOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {

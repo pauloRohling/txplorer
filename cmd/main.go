@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	_ "github.com/pauloRohling/txplorer/docs"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
@@ -29,9 +30,21 @@ var (
 	environment env.Environment
 )
 
+//	@title			TxPlorer API
+//	@version		1.0
+//	@description	This is a transactional application that allows users to transfer funds between their accounts.
+
+//	@contact.name	API Support
+//	@contact.url	https://github.com/pauloRohling/txplorer
+
+//	@license.name	MIT
+//	@license.url	https://github.com/pauloRohling/txplorer/blob/master/LICENSE
+
+// @host		localhost:8080
+// @BasePath	/api/v1
 func main() {
 	banner.Show()
-	_, _ = envconfig.Init(&environment)
+	profile, _ := envconfig.Init(&environment)
 
 	if err := environment.Validate(); err != nil {
 		slog.Error(err.Error())
@@ -92,6 +105,10 @@ func main() {
 	httpServer.AddRoute(accountRouter)
 	httpServer.AddRoute(operationRouter)
 	httpServer.AddRoute(userRouter)
+
+	if profile == envconfig.Dev {
+		httpServer.AddSwaggerRoute()
+	}
 
 	slog.Info("Web server started listening on", "port", environment.Server.Port, "startup time", time.Since(start))
 	if err = httpServer.Start(); err != nil {

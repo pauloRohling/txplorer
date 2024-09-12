@@ -1,0 +1,343 @@
+basePath: /api/v1
+definitions:
+  account.CreateAccountOutput:
+    properties:
+      balance:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/model.AccountStatus'
+      updatedAt:
+        type: string
+      userId:
+        type: string
+    type: object
+  model.AccountStatus:
+    enum:
+    - ACTIVE
+    - INACTIVE
+    type: string
+    x-enum-varnames:
+    - AccountStatusActive
+    - AccountStatusInactive
+  model.Error:
+    properties:
+      message:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/model.ErrorType'
+    type: object
+  model.ErrorType:
+    enum:
+    - ForbiddenError
+    - InternalError
+    - NotFoundError
+    - UnauthorizedError
+    - ValidationError
+    type: string
+    x-enum-varnames:
+    - ForbiddenErrorType
+    - InternalErrorType
+    - NotFoundErrorType
+    - UnauthorizedErrorType
+    - ValidationErrorType
+  model.OperationStatus:
+    enum:
+    - PENDING
+    - SUCCESS
+    - FAILED
+    type: string
+    x-enum-varnames:
+    - OperationStatusPending
+    - OperationStatusSuccess
+    - OperationStatusFailed
+  operation.DepositOutput:
+    properties:
+      amount:
+        type: integer
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      fromAccountId:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/model.OperationStatus'
+      toAccountId:
+        type: string
+      type:
+        type: string
+    type: object
+  operation.TransferOutput:
+    properties:
+      amount:
+        type: integer
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      fromAccountId:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/model.OperationStatus'
+      toAccountId:
+        type: string
+      type:
+        type: string
+    type: object
+  operation.WithdrawOutput:
+    properties:
+      amount:
+        type: integer
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      fromAccountId:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/model.OperationStatus'
+      toAccountId:
+        type: string
+      type:
+        type: string
+    type: object
+  types.CreateAccountInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  types.DepositInput:
+    properties:
+      accountId:
+        type: string
+      amount:
+        type: integer
+    type: object
+  types.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  types.TransferInput:
+    properties:
+      amount:
+        type: integer
+      fromAccountId:
+        type: string
+      toAccountId:
+        type: string
+    type: object
+  types.WithdrawInput:
+    properties:
+      accountId:
+        type: string
+      amount:
+        type: integer
+    type: object
+  user.LoginOutput:
+    properties:
+      accessToken:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: API Support
+    url: https://github.com/pauloRohling/txplorer
+  description: This is a transactional application that allows users to transfer funds
+    between their accounts.
+  license:
+    name: MIT
+    url: https://github.com/pauloRohling/txplorer/blob/master/LICENSE
+  title: TxPlorer API
+  version: "1.0"
+paths:
+  /accounts:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new account and a new user
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateAccountInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.CreateAccountOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create Account
+      tags:
+      - Account
+  /operations/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposits funds to an account
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/types.DepositInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/operation.DepositOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Deposit
+      tags:
+      - Operation
+  /operations/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfers funds from one account to another
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/types.TransferInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/operation.TransferOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Transfer
+      tags:
+      - Operation
+  /operations/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Withdraws funds from an account
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/types.WithdrawInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/operation.WithdrawOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Withdraw
+      tags:
+      - Operation
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Generates a JWT token to authenticate the user
+      parameters:
+      - description: Email
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.LoginOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Login
+      tags:
+      - User
+swagger: "2.0"

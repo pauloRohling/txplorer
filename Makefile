@@ -42,6 +42,16 @@ migrate-up:
 migrate-down:
 	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(SCHEMA_PACKAGE_PATH) -database $(POSTGRES_URL) down -all
 
+.PHONY: docs
+## docs: generate swagger docs
+docs: docs-fmt
+	docker run --rm -v .:/code ghcr.io/swaggo/swag:latest init  -d cmd,internal
+
+.PHONY: docs-fmt
+## docs-fmt: format swagger docs
+docs-fmt:
+	swag fmt -d cmd,internal/presentation/rest
+
 .PHONY: migration
 ## migration name=?: create a new migration
 migration:

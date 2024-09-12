@@ -29,6 +29,7 @@ the business logic, while the persistence layer handles the transactional aspect
 - [sqlc](https://github.com/kyleconroy/sqlc)
 - [migrate](https://github.com/golang-migrate/migrate)
 - [make](https://www.gnu.org/software/make/)
+- [swag](https://github.com/swaggo/swag)
 
 ## API
 

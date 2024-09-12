@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"time"
 )
@@ -53,6 +54,12 @@ func (server *WebServer) Start() error {
 		return err
 	}
 	return nil
+}
+
+func (server *WebServer) AddSwaggerRoute() {
+	url := fmt.Sprintf("http://localhost:%d/swagger/doc.json", server.port)
+	handler := httpSwagger.Handler(httpSwagger.URL(url))
+	server.router.Get("/swagger/*", handler)
 }
 
 func (server *WebServer) Shutdown(ctx context.Context) error {

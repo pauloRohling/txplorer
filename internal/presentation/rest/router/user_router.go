@@ -26,6 +26,19 @@ func (router *UserRouter) Route(r chi.Router) {
 	r.Post("/login", webserver.Endpoint(router.Login, http.StatusOK))
 }
 
+// Login godoc
+//
+//	@Summary		Login
+//	@Description	Generates a JWT token to authenticate the user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			credentials	body		types.LoginInput	true	"Email"
+//	@Success		200			{object}	user.LoginOutput
+//	@Failure		400			{object}	model.Error
+//	@Failure		401			{object}	model.Error
+//	@Failure		500			{object}	model.Error
+//	@Router			/users/login [post]
 func (router *UserRouter) Login(_ http.ResponseWriter, r *http.Request) (*user.LoginOutput, error) {
 	jsonInput, err := json.Parse[types.LoginInput](r)
 	if err != nil {
