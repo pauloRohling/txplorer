@@ -61,3 +61,8 @@ the business logic, while the persistence layer handles the transactional aspect
 | `DATABASE_MAX_IDLE_CONNS`     | Maximum number of idle connections  | 10            | false    |
 | `DATABASE_CONN_MAX_LIFETIME`  | Maximum lifetime of a connection    | 5m            | false    |
 | `DATABASE_CONN_MAX_IDLE_TIME` | Maximum idle time of a connection   | 30s           | false    |
+
+
+## License
+
+TxPlorer is released under the MIT License. See the [LICENSE](LICENSE) file for more information.
