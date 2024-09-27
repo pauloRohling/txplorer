@@ -202,6 +202,65 @@ func (_c *MockAccountRepository_GetById_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
+// GetByUserId provides a mock function with given fields: ctx, userId
+func (_m *MockAccountRepository) GetByUserId(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+	ret := _m.Called(ctx, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByUserId")
+	}
+
+	var r0 *model.Account
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.Account, error)); ok {
+		return rf(ctx, userId)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.Account); ok {
+		r0 = rf(ctx, userId)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Account)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, userId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockAccountRepository_GetByUserId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByUserId'
+type MockAccountRepository_GetByUserId_Call struct {
+	*mock.Call
+}
+
+// GetByUserId is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userId uuid.UUID
+func (_e *MockAccountRepository_Expecter) GetByUserId(ctx interface{}, userId interface{}) *MockAccountRepository_GetByUserId_Call {
+	return &MockAccountRepository_GetByUserId_Call{Call: _e.mock.On("GetByUserId", ctx, userId)}
+}
+
+func (_c *MockAccountRepository_GetByUserId_Call) Run(run func(ctx context.Context, userId uuid.UUID)) *MockAccountRepository_GetByUserId_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_GetByUserId_Call) Return(_a0 *model.Account, _a1 error) *MockAccountRepository_GetByUserId_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockAccountRepository_GetByUserId_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*model.Account, error)) *MockAccountRepository_GetByUserId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockAccountRepository creates a new instance of MockAccountRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockAccountRepository(t interface {

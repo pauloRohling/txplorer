@@ -37,13 +37,16 @@ func (suite *TransferActionSuite) SetupTest() {
 }
 
 func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
+	userId := uuid.New()
+
 	input := &TransferInput{
 		FromAccountID: uuid.New(),
 		ToAccountID:   uuid.New(),
+		RequesterID:   userId,
 		Amount:        100,
 	}
 
-	expectedTransaction := &model.Operation{
+	expectedOperation := &model.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
@@ -51,8 +54,13 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 
 	expectedAccount := &model.Account{
 		ID:      input.ToAccountID,
+		UserID:  userId,
 		Balance: 10000,
 	}
+
+	suite.accountRepository.EXPECT().
+		GetById(mock.Anything, input.FromAccountID).
+		Return(expectedAccount, nil)
 
 	suite.transactionManager.EXPECT().
 		RunTransaction(mock.Anything, mock.Anything).
@@ -62,11 +70,11 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		Return(expectedTransaction, nil)
+		Return(expectedOperation, nil)
 
 	suite.operationRepository.EXPECT().
 		UpdateStatus(mock.Anything, mock.Anything, mock.Anything).
-		Return(expectedTransaction, nil)
+		Return(expectedOperation, nil)
 
 	suite.accountRepository.EXPECT().
 		AddBalanceById(mock.Anything, mock.Anything, mock.Anything).
@@ -97,16 +105,29 @@ func (suite *TransferActionSuite) TestShouldFailTransferWithInvalidInputs() {
 	}
 }
 
-func (suite *TransferActionSuite) TestShouldFailOnTransactionCreationError() {
+func (suite *TransferActionSuite) TestShouldFailOnOperationCreationError() {
+	userId := uuid.New()
+
 	input := TransferInput{
 		FromAccountID: uuid.New(),
 		ToAccountID:   uuid.New(),
+		RequesterID:   userId,
 		Amount:        100,
 	}
 
+	expectedAccount := &model.Account{
+		ID:      input.FromAccountID,
+		UserID:  userId,
+		Balance: 10000,
+	}
+
+	suite.accountRepository.EXPECT().
+		GetById(mock.Anything, input.FromAccountID).
+		Return(expectedAccount, nil)
+
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		Return(nil, fmt.Errorf("failed to create transaction"))
+		Return(nil, fmt.Errorf("failed to create operation"))
 
 	output, err := suite.action.Execute(context.TODO(), input)
 	suite.Error(err)
@@ -114,21 +135,34 @@ func (suite *TransferActionSuite) TestShouldFailOnTransactionCreationError() {
 }
 
 func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionError() {
+	userId := uuid.New()
+
 	input := TransferInput{
 		FromAccountID: uuid.New(),
 		ToAccountID:   uuid.New(),
+		RequesterID:   userId,
 		Amount:        100,
 	}
 
-	expectedTransaction := &model.Operation{
+	expectedAccount := &model.Account{
+		ID:      input.FromAccountID,
+		UserID:  userId,
+		Balance: 10000,
+	}
+
+	expectedOperation := &model.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
 	}
 
+	suite.accountRepository.EXPECT().
+		GetById(mock.Anything, input.FromAccountID).
+		Return(expectedAccount, nil)
+
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		Return(expectedTransaction, nil)
+		Return(expectedOperation, nil)
 
 	suite.transactionManager.EXPECT().
 		RunTransaction(mock.Anything, mock.Anything).
@@ -136,7 +170,7 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 
 	suite.operationRepository.EXPECT().
 		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusFailed).
-		Return(expectedTransaction, nil)
+		Return(expectedOperation, nil)
 
 	output, err := suite.action.Execute(context.TODO(), input)
 	suite.Error(err)
@@ -144,21 +178,34 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 }
 
 func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusError() {
+	userId := uuid.New()
+
 	input := TransferInput{
 		FromAccountID: uuid.New(),
 		ToAccountID:   uuid.New(),
+		RequesterID:   userId,
 		Amount:        100,
 	}
 
-	expectedTransaction := &model.Operation{
+	expectedAccount := &model.Account{
+		ID:      input.FromAccountID,
+		UserID:  userId,
+		Balance: 10000,
+	}
+
+	expectedOperation := &model.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
 	}
 
+	suite.accountRepository.EXPECT().
+		GetById(mock.Anything, input.FromAccountID).
+		Return(expectedAccount, nil)
+
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		Return(expectedTransaction, nil)
+		Return(expectedOperation, nil)
 
 	suite.transactionManager.EXPECT().
 		RunTransaction(mock.Anything, mock.Anything).
@@ -223,7 +270,7 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		Amount:        100,
 	}
 
-	expectedTransaction := &model.Operation{
+	expectedOperation := &model.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
@@ -243,7 +290,7 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusSuccess).
 		Return(nil, fmt.Errorf("failed to update status"))
 
-	output, err := suite.action.updateBalances(context.TODO(), input, expectedTransaction.ID)
+	output, err := suite.action.updateBalances(context.TODO(), input, expectedOperation.ID)
 	suite.Error(err)
 	suite.Nil(output)
 }

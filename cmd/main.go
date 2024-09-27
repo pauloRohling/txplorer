@@ -33,19 +33,16 @@ var (
 //	@title			TxPlorer API
 //	@version		1.0
 //	@description	This is a transactional application that allows users to transfer funds between their accounts.
-
 //	@contact.name	API Support
 //	@contact.url	https://github.com/pauloRohling/txplorer
-
 //	@license.name	MIT
 //	@license.url	https://github.com/pauloRohling/txplorer/blob/master/LICENSE
-
 //	@securityDefinitions.apikey	BearerAuth
 //	@in							header
 //	@name						Authorization
 //	@description				"Authorization: Bearer <token>"
 //	@tokenUrl					/users/login
-
+//
 // @host		localhost:8080
 // @BasePath	/api/v1
 func main() {
