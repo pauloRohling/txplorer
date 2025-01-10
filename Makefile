@@ -1,8 +1,7 @@
-BINARY_NAME = txplorer
-MAIN_PACKAGE_PATH = ./cmd
 QUERIES_PACKAGE_PATH = ./internal/persistance/queries
 SCHEMA_PACKAGE_PATH = ./internal/persistance/schema
 POSTGRES_URL = "postgres://postgres:postgres@localhost:5432/txplorer?sslmode=disable"
+PACKAGES = ./internal/...
 
 ## help: print this help message
 .PHONY: help
@@ -70,13 +69,18 @@ mock:
 ## test: run all tests
 .PHONY: test
 test:
-	go test -v -race -failfast -buildvcs ./internal/...
+	go test -race -failfast -buildvcs $(PACKAGES)
 
-## test/cover: run all tests and display coverage
-.PHONY: test/cover
-test/cover:
-	go test -v -race -buildvcs -coverprofile=./tmp/coverage.out ./internal/...
+## test/c: run all tests and display coverage
+.PHONY: test/c
+test/c:
+	go test -v -race -buildvcs -coverprofile=./tmp/coverage.out $(PACKAGES)
 	go tool cover -html=./tmp/coverage.out
+
+## test/v: run all tests in verbose mode
+.PHONY: test/v
+test/v:
+	go test -v -race -failfast -buildvcs $(PACKAGES)
 
 ## run: run the application
 .PHONY: run
