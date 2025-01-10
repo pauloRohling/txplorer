@@ -9,7 +9,7 @@ RUN go build -ldflags="-w -s" -o=./cmd/txplorer.tmp ./cmd
 FROM gruebel/upx:latest as upx
 ARG UPX_VERSION=4.2.4
 WORKDIR /app
-COPY --from=builder /app/cmd .
+COPY --from=builder /app/txplorer.tmp /app/banner.txt /app/env.yml ./
 RUN upx --lzma --best -o ./txplorer ./txplorer.tmp
 RUN rm -rf ./txplorer.tmp
 
