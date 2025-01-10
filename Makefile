@@ -85,4 +85,4 @@ test/v:
 ## run: run the application
 .PHONY: run
 run:
-	go run -v ./cmd/main.go
+	air -c .air.toml
