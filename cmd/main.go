@@ -10,7 +10,7 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"github.com/pauloRohling/txplorer/internal/mapper"
-	"github.com/pauloRohling/txplorer/internal/persistance"
+	"github.com/pauloRohling/txplorer/internal/persistence"
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/router"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
@@ -75,9 +75,9 @@ func main() {
 	operationMapper := mapper.NewOperationMapper()
 	userMapper := mapper.NewUserMapper()
 
-	accountRepository := persistance.NewAccountRepository(db, accountMapper)
-	operationRepository := persistance.NewOperationRepository(db, operationMapper)
-	userRepository := persistance.NewUserRepository(db, userMapper)
+	accountRepository := persistence.NewAccountRepository(db, accountMapper)
+	operationRepository := persistence.NewOperationRepository(db, operationMapper)
+	userRepository := persistence.NewUserRepository(db, userMapper)
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
 	getAccountAction := account.NewGetAccountAction(accountRepository)

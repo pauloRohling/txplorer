@@ -1,12 +1,12 @@
-package persistance
+package persistence
 
 import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/model"
-	"github.com/pauloRohling/txplorer/internal/persistance/mapper"
-	"github.com/pauloRohling/txplorer/internal/persistance/store"
+	"github.com/pauloRohling/txplorer/internal/persistence/mapper"
+	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
 )
 

@@ -2,7 +2,7 @@ package mapper
 
 import (
 	"github.com/pauloRohling/txplorer/internal/model"
-	"github.com/pauloRohling/txplorer/internal/persistance/store"
+	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
 type OperationMapper interface {
