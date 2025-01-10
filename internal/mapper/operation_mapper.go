@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
@@ -12,8 +12,8 @@ func NewOperationMapper() *OperationMapper {
 	return &OperationMapper{}
 }
 
-func (mapper *OperationMapper) ToModel(operation store.Operation) *model.Operation {
-	return &model.Operation{
+func (mapper *OperationMapper) ToModel(operation store.Operation) *domain.Operation {
+	return &domain.Operation{
 		ID:            operation.ID,
 		FromAccountID: operation.FromAccountID,
 		ToAccountID:   operation.ToAccountID,
@@ -21,6 +21,6 @@ func (mapper *OperationMapper) ToModel(operation store.Operation) *model.Operati
 		Type:          operation.Type,
 		CreatedAt:     operation.CreatedAt,
 		CreatedBy:     operation.CreatedBy,
-		Status:        model.OperationStatus(operation.Status),
+		Status:        domain.OperationStatus(operation.Status),
 	}
 }

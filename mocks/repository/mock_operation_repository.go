@@ -5,7 +5,7 @@ package mockrepository
 import (
 	context "context"
 
-	model "github.com/pauloRohling/txplorer/internal/model"
+	model "github.com/pauloRohling/txplorer/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"
@@ -61,7 +61,7 @@ type MockOperationRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - entity *model.Operation
+//   - entity *domain.Operation
 func (_e *MockOperationRepository_Expecter) Create(ctx interface{}, entity interface{}) *MockOperationRepository_Create_Call {
 	return &MockOperationRepository_Create_Call{Call: _e.mock.On("Create", ctx, entity)}
 }
@@ -121,7 +121,7 @@ type MockOperationRepository_UpdateStatus_Call struct {
 // UpdateStatus is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uuid.UUID
-//   - status model.OperationStatus
+//   - status domain.OperationStatus
 func (_e *MockOperationRepository_Expecter) UpdateStatus(ctx interface{}, id interface{}, status interface{}) *MockOperationRepository_UpdateStatus_Call {
 	return &MockOperationRepository_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, id, status)}
 }

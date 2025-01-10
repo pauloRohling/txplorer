@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/pauloRohling/txplorer/internal/domain/user"
+	"github.com/pauloRohling/txplorer/internal/application/user"
 )
 
 type UserService interface {

@@ -3,7 +3,7 @@ package json
 import (
 	"encoding/json"
 	"errors"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"io"
 	"log/slog"
 	"net/http"
@@ -31,12 +31,12 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) {
 
 func WriteError(w http.ResponseWriter, err error) {
 	if err == nil {
-		err = model.InternalError("Empty error")
+		err = domain.InternalError("Empty error")
 	}
 
-	var customErr model.Error
+	var customErr domain.Error
 	if !errors.As(err, &customErr) {
-		customErr = model.InternalError(err.Error())
+		customErr = domain.InternalError(err.Error())
 	}
 
 	if customErr.Err == nil {

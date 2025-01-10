@@ -3,8 +3,8 @@ package operation
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/domain/repository"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/application/repository"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
 	"time"
 )
@@ -16,7 +16,7 @@ type DepositInput struct {
 }
 
 type DepositOutput struct {
-	*model.Operation
+	*domain.Operation
 }
 
 type DepositAction struct {
@@ -35,23 +35,23 @@ func NewDepositAction(accountRepository repository.AccountRepository, operationR
 
 func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*DepositOutput, error) {
 	if input.Amount <= 0 {
-		return nil, model.ValidationError("Amount must be greater than 0 to make a deposit")
+		return nil, domain.ValidationError("Amount must be greater than 0 to make a deposit")
 	}
 
 	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, model.InternalError("Failed to generate operation id", err)
+		return nil, domain.InternalError("Failed to generate operation id", err)
 	}
 
-	depositOperation := &model.Operation{
+	depositOperation := &domain.Operation{
 		ID:            operationId,
 		FromAccountID: input.AccountID,
 		ToAccountID:   input.AccountID,
 		Amount:        input.Amount,
-		Type:          model.OperationTypeDeposit.String(),
+		Type:          domain.OperationTypeDeposit.String(),
 		CreatedAt:     time.Now().UTC(),
 		CreatedBy:     input.RequesterID,
-		Status:        model.OperationStatusPending,
+		Status:        domain.OperationStatusPending,
 	}
 
 	operation, err := action.operationRepository.Create(ctx, depositOperation)
@@ -65,9 +65,9 @@ func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*
 	})
 
 	if err != nil {
-		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusFailed)
+		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, domain.OperationStatusFailed)
 		if errOperation != nil {
-			return nil, model.InternalError("Failed to update operation status to FAILED", errOperation)
+			return nil, domain.InternalError("Failed to update operation status to FAILED", errOperation)
 		}
 		return nil, err
 	}
@@ -75,19 +75,19 @@ func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*
 	return &DepositOutput{Operation: operation}, nil
 }
 
-func (action *DepositAction) updateBalance(ctx context.Context, input DepositInput, operationId uuid.UUID) (*model.Operation, error) {
+func (action *DepositAction) updateBalance(ctx context.Context, input DepositInput, operationId uuid.UUID) (*domain.Operation, error) {
 	account, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount)
 	if err != nil {
-		return nil, model.InternalError("Failed to update account balance", err)
+		return nil, domain.InternalError("Failed to update account balance", err)
 	}
 
 	if account.Balance < 0 {
-		return nil, model.ValidationError("Account balance is negative")
+		return nil, domain.ValidationError("Account balance is negative")
 	}
 
-	operation, err := action.operationRepository.UpdateStatus(ctx, operationId, model.OperationStatusSuccess)
+	operation, err := action.operationRepository.UpdateStatus(ctx, operationId, domain.OperationStatusSuccess)
 	if err != nil {
-		return nil, model.InternalError("Failed to update operation status to SUCCESS", err)
+		return nil, domain.InternalError("Failed to update operation status to SUCCESS", err)
 	}
 
 	return operation, nil

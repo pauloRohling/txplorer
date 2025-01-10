@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"github.com/pauloRohling/txplorer/internal/persistence/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -29,7 +29,7 @@ func (repository *UserRepository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.db)
 }
 
-func (repository *UserRepository) Create(ctx context.Context, name string, email string, password string) (*model.User, error) {
+func (repository *UserRepository) Create(ctx context.Context, name string, email string, password string) (*domain.User, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (repository *UserRepository) Create(ctx context.Context, name string, email
 	return repository.userMapper.ToModel(user), nil
 }
 
-func (repository *UserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+func (repository *UserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user, err := repository.query(ctx).FindUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err

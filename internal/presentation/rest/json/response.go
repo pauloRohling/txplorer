@@ -1,7 +1,7 @@
 package json
 
 import (
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"net/http"
 	"time"
 )
@@ -14,7 +14,7 @@ type Response struct {
 	Timestamp string `json:"timestamp"`
 }
 
-func NewResponseFromError(err model.Error) Response {
+func NewResponseFromError(err domain.Error) Response {
 	status := ErrorStatus(err)
 	return Response{
 		Status:    status,
@@ -25,17 +25,17 @@ func NewResponseFromError(err model.Error) Response {
 	}
 }
 
-func ErrorStatus(err model.Error) int {
+func ErrorStatus(err domain.Error) int {
 	switch err.Type {
-	case model.InternalErrorType:
+	case domain.InternalErrorType:
 		return http.StatusInternalServerError
-	case model.ForbiddenErrorType:
+	case domain.ForbiddenErrorType:
 		return http.StatusForbidden
-	case model.NotFoundErrorType:
+	case domain.NotFoundErrorType:
 		return http.StatusNotFound
-	case model.UnauthorizedErrorType:
+	case domain.UnauthorizedErrorType:
 		return http.StatusUnauthorized
-	case model.ValidationErrorType:
+	case domain.ValidationErrorType:
 		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError

@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/pauloRohling/txplorer/internal/domain/account"
+	"github.com/pauloRohling/txplorer/internal/application/account"
 )
 
 type AccountService interface {

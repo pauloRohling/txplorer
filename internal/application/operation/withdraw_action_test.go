@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	mockrepository "github.com/pauloRohling/txplorer/mocks/repository"
 	mocktransaction "github.com/pauloRohling/txplorer/mocks/transaction"
 	"github.com/stretchr/testify/mock"
@@ -45,20 +45,20 @@ func (suite *WithdrawActionSuite) TestShouldWithdrawSuccessfully() {
 		Amount:      100,
 	}
 
-	expectedAccount := &model.Account{
+	expectedAccount := &domain.Account{
 		ID:      input.AccountID,
 		UserID:  userId,
 		Balance: 10000,
 	}
 
-	expectedOperation := &model.Operation{
+	expectedOperation := &domain.Operation{
 		ID:            uuid.New(),
 		FromAccountID: input.AccountID,
 		ToAccountID:   input.AccountID,
 		Amount:        input.Amount,
-		Type:          model.OperationTypeWithdraw.String(),
+		Type:          domain.OperationTypeWithdraw.String(),
 		CreatedBy:     input.RequesterID,
-		Status:        model.OperationStatusPending,
+		Status:        domain.OperationStatusPending,
 	}
 
 	suite.accountRepository.EXPECT().
@@ -67,7 +67,7 @@ func (suite *WithdrawActionSuite) TestShouldWithdrawSuccessfully() {
 
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		RunAndReturn(func(ctx context.Context, operation *model.Operation) (*model.Operation, error) {
+		RunAndReturn(func(ctx context.Context, operation *domain.Operation) (*domain.Operation, error) {
 			return operation, nil
 		})
 

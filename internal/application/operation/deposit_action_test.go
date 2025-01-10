@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	mockrepository "github.com/pauloRohling/txplorer/mocks/repository"
 	mocktransaction "github.com/pauloRohling/txplorer/mocks/transaction"
 	"github.com/stretchr/testify/mock"
@@ -43,24 +43,24 @@ func (suite *DepositActionSuite) TestShouldDepositSuccessfully() {
 		Amount:      100,
 	}
 
-	expectedAccount := &model.Account{
+	expectedAccount := &domain.Account{
 		ID:      input.AccountID,
 		Balance: 10000,
 	}
 
-	expectedOperation := &model.Operation{
+	expectedOperation := &domain.Operation{
 		ID:            uuid.New(),
 		FromAccountID: input.AccountID,
 		ToAccountID:   input.AccountID,
 		Amount:        input.Amount,
-		Type:          model.OperationTypeDeposit.String(),
+		Type:          domain.OperationTypeDeposit.String(),
 		CreatedBy:     input.RequesterID,
-		Status:        model.OperationStatusPending,
+		Status:        domain.OperationStatusPending,
 	}
 
 	suite.operationRepository.EXPECT().
 		Create(mock.Anything, mock.Anything).
-		RunAndReturn(func(ctx context.Context, operation *model.Operation) (*model.Operation, error) {
+		RunAndReturn(func(ctx context.Context, operation *domain.Operation) (*domain.Operation, error) {
 			return operation, nil
 		})
 
@@ -124,14 +124,14 @@ func (suite *DepositActionSuite) TestShouldUpdateStatusToFailedOnOperationError(
 		Amount:      100,
 	}
 
-	expectedOperation := &model.Operation{
+	expectedOperation := &domain.Operation{
 		ID:            uuid.New(),
 		FromAccountID: input.AccountID,
 		ToAccountID:   input.AccountID,
 		Amount:        input.Amount,
-		Type:          model.OperationTypeDeposit.String(),
+		Type:          domain.OperationTypeDeposit.String(),
 		CreatedBy:     input.RequesterID,
-		Status:        model.OperationStatusPending,
+		Status:        domain.OperationStatusPending,
 	}
 
 	suite.operationRepository.EXPECT().
@@ -143,7 +143,7 @@ func (suite *DepositActionSuite) TestShouldUpdateStatusToFailedOnOperationError(
 		Return(fmt.Errorf("failed to update balances"))
 
 	suite.operationRepository.EXPECT().
-		UpdateStatus(mock.Anything, mock.Anything, model.OperationStatusFailed).
+		UpdateStatus(mock.Anything, mock.Anything, domain.OperationStatusFailed).
 		Return(expectedOperation, nil)
 
 	output, err := suite.action.Execute(context.TODO(), input)

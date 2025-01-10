@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/pauloRohling/txplorer/internal/domain/operation"
+	"github.com/pauloRohling/txplorer/internal/application/operation"
 )
 
 type OperationService interface {

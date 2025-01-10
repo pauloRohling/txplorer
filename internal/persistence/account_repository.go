@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/model"
+	"github.com/pauloRohling/txplorer/internal/domain"
 	"github.com/pauloRohling/txplorer/internal/persistence/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -29,7 +29,7 @@ func (repository *AccountRepository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.db)
 }
 
-func (repository *AccountRepository) Create(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+func (repository *AccountRepository) Create(ctx context.Context, userId uuid.UUID) (*domain.Account, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (repository *AccountRepository) Create(ctx context.Context, userId uuid.UUI
 	return repository.accountMapper.ToModel(account), nil
 }
 
-func (repository *AccountRepository) AddBalanceById(ctx context.Context, id uuid.UUID, balance int64) (*model.Account, error) {
+func (repository *AccountRepository) AddBalanceById(ctx context.Context, id uuid.UUID, balance int64) (*domain.Account, error) {
 	account, err := repository.query(ctx).AddBalanceById(ctx, store.AddBalanceByIdParams{
 		ID:      id,
 		Balance: balance,
@@ -60,7 +60,7 @@ func (repository *AccountRepository) AddBalanceById(ctx context.Context, id uuid
 	return repository.accountMapper.ToModel(account), nil
 }
 
-func (repository *AccountRepository) GetById(ctx context.Context, id uuid.UUID) (*model.Account, error) {
+func (repository *AccountRepository) GetById(ctx context.Context, id uuid.UUID) (*domain.Account, error) {
 	account, err := repository.query(ctx).GetAccountById(ctx, id)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (repository *AccountRepository) GetById(ctx context.Context, id uuid.UUID) 
 	return repository.accountMapper.ToModel(account), nil
 }
 
-func (repository *AccountRepository) GetByUserId(ctx context.Context, userId uuid.UUID) (*model.Account, error) {
+func (repository *AccountRepository) GetByUserId(ctx context.Context, userId uuid.UUID) (*domain.Account, error) {
 	account, err := repository.query(ctx).GetAccountByUserId(ctx, userId)
 	if err != nil {
 		return nil, err
