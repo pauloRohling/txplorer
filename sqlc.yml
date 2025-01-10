@@ -2,7 +2,7 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries: "./internal/persistence/queries"
-    schema: "./internal/persistence/schema"
+    schema: "./db"
     gen:
       go:
         package: "store"

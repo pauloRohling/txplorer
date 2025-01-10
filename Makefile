@@ -1,5 +1,5 @@
 QUERIES_PACKAGE_PATH = ./internal/persistence/queries
-SCHEMA_PACKAGE_PATH = ./internal/persistence/schema
+SCHEMA_PACKAGE_PATH = ./db
 POSTGRES_URL = "postgres://postgres:postgres@localhost:5432/txplorer?sslmode=disable"
 PACKAGES = ./internal/...
 
