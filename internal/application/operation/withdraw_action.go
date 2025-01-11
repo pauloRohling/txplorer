@@ -3,9 +3,9 @@ package operation
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
-	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
 	"time"
 )
@@ -36,21 +36,21 @@ func NewWithdrawAction(accountRepository account.Repository, operationRepository
 
 func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) (*WithdrawOutput, error) {
 	if input.Amount <= 0 {
-		return nil, throw.ValidationError("Amount must be greater than 0 to make a withdrawal")
+		return nil, throw.Validation().Msg("Amount must be greater than 0 to make a withdrawal")
 	}
 
 	newAccount, err := action.accountRepository.GetById(ctx, input.AccountID)
 	if err != nil {
-		return nil, throw.InternalError("Failed to get account", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to get account")
 	}
 
 	if newAccount.UserID != input.RequesterID {
-		return nil, throw.UnauthorizedError("You are not authorized to make this withdrawal")
+		return nil, throw.Unauthorized().Msg("You are not authorized to make this withdrawal")
 	}
 
 	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, throw.InternalError("Failed to generate operation id", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to generate operation id")
 	}
 
 	withdrawOperation := &operation.Operation{
@@ -77,7 +77,7 @@ func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) 
 	if err != nil {
 		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, operation.FailedStatus)
 		if errOperation != nil {
-			return nil, throw.InternalError("Failed to update operation status to FAILED", errOperation)
+			return nil, throw.Internal().Err(errOperation).Msg("Failed to update operation status to FAILED")
 		}
 		return nil, err
 	}
@@ -88,16 +88,16 @@ func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) 
 func (action *WithdrawAction) updateBalance(ctx context.Context, input WithdrawInput, operationId uuid.UUID) (*operation.Operation, error) {
 	newAccount, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount*-1)
 	if err != nil {
-		return nil, throw.InternalError("Failed to update account balance", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to update account balance")
 	}
 
 	if newAccount.Balance < 0 {
-		return nil, throw.ValidationError("Account balance is negative")
+		return nil, throw.Validation().Msg("Account balance is negative")
 	}
 
 	updatedOperation, err := action.operationRepository.UpdateStatus(ctx, operationId, operation.SuccessStatus)
 	if err != nil {
-		return nil, throw.InternalError("Failed to update operation status to SUCCESS", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to update operation status to SUCCESS")
 	}
 
 	return updatedOperation, nil

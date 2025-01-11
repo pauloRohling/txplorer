@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
@@ -39,7 +40,7 @@ func (repository *Repository) Create(ctx context.Context, entity *operation.Oper
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to create operation")
 	}
 
 	return repository.operationMapper.ToModel(transactionEntity), nil
@@ -52,7 +53,7 @@ func (repository *Repository) UpdateStatus(ctx context.Context, id uuid.UUID, st
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to update operation status")
 	}
 
 	return repository.operationMapper.ToModel(transactionEntity), nil

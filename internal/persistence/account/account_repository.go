@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
@@ -31,7 +32,7 @@ func (repository *Repository) query(ctx context.Context) *store.Queries {
 func (repository *Repository) Create(ctx context.Context, userId uuid.UUID) (*account.Account, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to generate account id")
 	}
 
 	newAccount, err := repository.query(ctx).InsertAccount(ctx, store.InsertAccountParams{
@@ -40,7 +41,7 @@ func (repository *Repository) Create(ctx context.Context, userId uuid.UUID) (*ac
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to create account")
 	}
 
 	return repository.accountMapper.ToModel(newAccount), nil
@@ -53,7 +54,7 @@ func (repository *Repository) AddBalanceById(ctx context.Context, id uuid.UUID, 
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to update account balance")
 	}
 
 	return repository.accountMapper.ToModel(updatedAccount), nil
@@ -62,7 +63,7 @@ func (repository *Repository) AddBalanceById(ctx context.Context, id uuid.UUID, 
 func (repository *Repository) GetById(ctx context.Context, id uuid.UUID) (*account.Account, error) {
 	savedAccount, err := repository.query(ctx).GetAccountById(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, throw.NotFound().Err(err).Msg("Account not found")
 	}
 
 	return repository.accountMapper.ToModel(savedAccount), nil
@@ -71,7 +72,7 @@ func (repository *Repository) GetById(ctx context.Context, id uuid.UUID) (*accou
 func (repository *Repository) GetByUserId(ctx context.Context, userId uuid.UUID) (*account.Account, error) {
 	savedAccount, err := repository.query(ctx).GetAccountByUserId(ctx, userId)
 	if err != nil {
-		return nil, err
+		return nil, throw.NotFound().Err(err).Msg("Account not found")
 	}
 
 	return repository.accountMapper.ToModel(savedAccount), nil

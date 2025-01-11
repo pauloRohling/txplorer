@@ -3,7 +3,7 @@ package json
 import (
 	"encoding/json"
 	"errors"
-	"github.com/pauloRohling/txplorer/internal/domain/throw"
+	"github.com/pauloRohling/throw"
 	"io"
 	"log/slog"
 	"net/http"
@@ -14,7 +14,7 @@ func Parse[T any](r *http.Request) (*T, error) {
 
 	var input T
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return nil, err
+		return nil, throw.Validation().Err(err).Msg("Failed to parse request body")
 	}
 
 	return &input, nil
@@ -30,23 +30,34 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) {
 }
 
 func WriteError(w http.ResponseWriter, err error) {
-	if err == nil {
-		err = throw.InternalError("Empty error")
-	}
-
-	var customErr throw.Error
-	if !errors.As(err, &customErr) {
-		customErr = throw.InternalError(err.Error())
-	}
-
-	if customErr.Err == nil {
-		slog.Error(customErr.Error())
-	} else {
-		slog.Error(customErr.Error(), "description", customErr.Err.Error())
-	}
-
-	slog.Error(customErr.StackTrace)
-
-	response := NewResponseFromError(customErr)
+	response := ErrorHandler(err)
 	WriteJSON(w, response.Status, response)
+}
+
+func ErrorHandler(err error) *HttpErrorResponse {
+	if err == nil {
+		err = throw.Internal().Msg("Unexpected error")
+	}
+
+	var customError *throw.Error
+	if !errors.As(err, &customError) {
+		customError = throw.Internal().Err(err).Msg("Unexpected error")
+	}
+
+	statusCode := throw.ErrorType(customError.Type()).StatusCode()
+	errResponse := &HttpErrorResponse{
+		Err:    customError.Unwrap(),
+		Title:  http.StatusText(statusCode),
+		Detail: customError.Error(),
+		Status: statusCode,
+	}
+
+	slog.Error(
+		errResponse.Title,
+		"status", errResponse.Status,
+		"detail", errResponse.Detail,
+		"error", errResponse.Err,
+	)
+
+	return errResponse
 }

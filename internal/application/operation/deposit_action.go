@@ -3,9 +3,9 @@ package operation
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
-	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
 	"time"
 )
@@ -36,12 +36,12 @@ func NewDepositAction(accountRepository account.Repository, operationRepository 
 
 func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*DepositOutput, error) {
 	if input.Amount <= 0 {
-		return nil, throw.ValidationError("Amount must be greater than 0 to make a deposit")
+		return nil, throw.Validation().Msg("Amount must be greater than 0 to make a deposit")
 	}
 
 	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, throw.InternalError("Failed to generate operation id", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to generate operation id")
 	}
 
 	depositOperation := &operation.Operation{
@@ -68,7 +68,7 @@ func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*
 	if err != nil {
 		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, operation.FailedStatus)
 		if errOperation != nil {
-			return nil, throw.InternalError("Failed to update operation status to FAILED", errOperation)
+			return nil, throw.Internal().Err(errOperation).Msg("Failed to update operation status to FAILED")
 		}
 		return nil, err
 	}
@@ -79,16 +79,16 @@ func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*
 func (action *DepositAction) updateBalance(ctx context.Context, input DepositInput, operationId uuid.UUID) (*operation.Operation, error) {
 	updatedAccount, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount)
 	if err != nil {
-		return nil, throw.InternalError("Failed to update account balance", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to update account balance")
 	}
 
 	if updatedAccount.Balance < 0 {
-		return nil, throw.ValidationError("Account balance is negative")
+		return nil, throw.Validation().Msg("Account balance is negative")
 	}
 
 	updatedStatus, err := action.operationRepository.UpdateStatus(ctx, operationId, operation.SuccessStatus)
 	if err != nil {
-		return nil, throw.InternalError("Failed to update operation status to SUCCESS", err)
+		return nil, throw.Internal().Err(err).Msg("Failed to update operation status to SUCCESS")
 	}
 
 	return updatedStatus, nil

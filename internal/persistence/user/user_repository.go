@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
@@ -31,7 +32,7 @@ func (repository *Repository) query(ctx context.Context) *store.Queries {
 func (repository *Repository) Create(ctx context.Context, name string, email string, password string) (*user.User, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to generate user id")
 	}
 
 	savedUser, err := repository.query(ctx).InsertUser(ctx, store.InsertUserParams{
@@ -42,7 +43,7 @@ func (repository *Repository) Create(ctx context.Context, name string, email str
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, throw.Internal().Err(err).Msg("Failed to create user")
 	}
 
 	return repository.userMapper.ToModel(savedUser), nil
@@ -51,7 +52,7 @@ func (repository *Repository) Create(ctx context.Context, name string, email str
 func (repository *Repository) FindByEmail(ctx context.Context, email string) (*user.User, error) {
 	savedUser, err := repository.query(ctx).FindUserByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, throw.NotFound().Err(err).Msg("User not found")
 	}
 
 	return repository.userMapper.ToModel(savedUser), nil

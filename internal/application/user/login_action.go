@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/pauloRohling/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/password"
-	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/token"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"time"
@@ -38,11 +38,11 @@ func NewLoginAction(userRepository user.Repository, passwordComparator password.
 func (action *LoginAction) Execute(ctx context.Context, input LoginInput) (*LoginOutput, error) {
 	savedUser, err := action.userRepository.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return nil, throw.NotFoundError("User not found")
+		return nil, throw.NotFound().Err(err).Msg("User not found")
 	}
 
 	if isEquals := action.passwordComparator.Compare(savedUser.Password, input.Password); !isEquals {
-		return nil, throw.UnauthorizedError("Invalid credentials")
+		return nil, throw.Unauthorized().Msg("Invalid credentials")
 	}
 
 	claims := action.generateClaims(savedUser.ID)
