@@ -1,4 +1,4 @@
-package router
+package operation
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -7,25 +7,24 @@ import (
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
-	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"net/http"
 )
 
-type OperationRouter struct {
+type RestController struct {
 	operationService operation.Service
 	secretHolder     presentation.SecretHolder
 }
 
-func NewOperationRouter(operationService operation.Service, secretHolder presentation.SecretHolder) *OperationRouter {
-	return &OperationRouter{operationService: operationService, secretHolder: secretHolder}
+func NewRestController(operationService operation.Service, secretHolder presentation.SecretHolder) *RestController {
+	return &RestController{operationService: operationService, secretHolder: secretHolder}
 }
 
-func (router *OperationRouter) Endpoint() string {
+func (router *RestController) Endpoint() string {
 	return webserver.OperationsApi
 }
 
-func (router *OperationRouter) Route(r chi.Router) {
+func (router *RestController) Route(r chi.Router) {
 	secret := router.secretHolder.Get()
 	r.Use(jwtauth.Verifier(secret))
 	r.Use(middleware.Authenticator(secret))
@@ -47,13 +46,13 @@ func (router *OperationRouter) Route(r chi.Router) {
 //	@Failure		401		{object}	model.Error
 //	@Failure		500		{object}	model.Error
 //	@Router			/operations/deposit [post]
-func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
+func (router *RestController) Deposit(_ http.ResponseWriter, r *http.Request) (*operation.DepositOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[types.DepositInput](r)
+	jsonInput, err := json.Parse[DepositInput](r)
 	if err != nil {
 		return nil, err
 	}
@@ -80,13 +79,13 @@ func (router *OperationRouter) Deposit(_ http.ResponseWriter, r *http.Request) (
 //	@Failure		401		{object}	model.Error
 //	@Failure		500		{object}	model.Error
 //	@Router			/operations/transfer [post]
-func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
+func (router *RestController) Transfer(_ http.ResponseWriter, r *http.Request) (*operation.TransferOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[types.TransferInput](r)
+	jsonInput, err := json.Parse[TransferInput](r)
 	if err != nil {
 		return nil, err
 	}
@@ -114,13 +113,13 @@ func (router *OperationRouter) Transfer(_ http.ResponseWriter, r *http.Request) 
 //	@Failure		401		{object}	model.Error
 //	@Failure		500		{object}	model.Error
 //	@Router			/operations/withdraw [post]
-func (router *OperationRouter) Withdraw(_ http.ResponseWriter, r *http.Request) (*operation.WithdrawOutput, error) {
+func (router *RestController) Withdraw(_ http.ResponseWriter, r *http.Request) (*operation.WithdrawOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
 	}
 
-	jsonInput, err := json.Parse[types.WithdrawInput](r)
+	jsonInput, err := json.Parse[WithdrawInput](r)
 	if err != nil {
 		return nil, err
 	}

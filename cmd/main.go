@@ -13,8 +13,10 @@ import (
 	accountPersitence "github.com/pauloRohling/txplorer/internal/persistence/account"
 	operationPersistence "github.com/pauloRohling/txplorer/internal/persistence/operation"
 	userPersistence "github.com/pauloRohling/txplorer/internal/persistence/user"
+	accountPresentation "github.com/pauloRohling/txplorer/internal/presentation/rest/account"
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
-	"github.com/pauloRohling/txplorer/internal/presentation/rest/router"
+	operationPresentation "github.com/pauloRohling/txplorer/internal/presentation/rest/operation"
+	userPresentation "github.com/pauloRohling/txplorer/internal/presentation/rest/user"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"github.com/pauloRohling/txplorer/pkg/crypto"
 	"github.com/pauloRohling/txplorer/pkg/graceful"
@@ -81,9 +83,9 @@ func main() {
 	operationService := operation.NewFacadeService(depositAction, transferAction, withdrawAction)
 	userService := user.NewFacadeService(loginAction)
 
-	accountRouter := router.NewAccountRouter(accountService, secretHolder)
-	operationRouter := router.NewOperationRouter(operationService, secretHolder)
-	userRouter := router.NewUserRouter(userService)
+	accountRouter := accountPresentation.NewRestController(accountService, secretHolder)
+	operationRouter := operationPresentation.NewRestController(operationService, secretHolder)
+	userRouter := userPresentation.NewRestController(userService)
 
 	httpServer := webserver.NewWebServer(env.Server.Port, nil)
 	gracefulShutdownCtx := graceful.Shutdown(&graceful.Params{

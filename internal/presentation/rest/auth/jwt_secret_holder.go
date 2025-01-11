@@ -21,3 +21,5 @@ func NewJwtSecretHolder(secret string) *JwtSecretHolder {
 func (holder *JwtSecretHolder) Get() *jwtauth.JWTAuth {
 	return holder.jwtAuth
 }
+
+var _ SecretHolder = (*JwtSecretHolder)(nil)

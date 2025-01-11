@@ -1,27 +1,26 @@
-package router
+package user
 
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pauloRohling/txplorer/internal/application/user"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
-	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"net/http"
 )
 
-type UserRouter struct {
+type RestController struct {
 	userService user.Service
 }
 
-func NewUserRouter(userService user.Service) *UserRouter {
-	return &UserRouter{userService: userService}
+func NewRestController(userService user.Service) *RestController {
+	return &RestController{userService: userService}
 }
 
-func (router *UserRouter) Endpoint() string {
+func (router *RestController) Endpoint() string {
 	return webserver.UsersApi
 }
 
-func (router *UserRouter) Route(r chi.Router) {
+func (router *RestController) Route(r chi.Router) {
 	r.Post("/login", webserver.Endpoint(router.Login, http.StatusOK))
 }
 
@@ -38,8 +37,8 @@ func (router *UserRouter) Route(r chi.Router) {
 //	@Failure		401			{object}	model.Error
 //	@Failure		500			{object}	model.Error
 //	@Router			/users/login [post]
-func (router *UserRouter) Login(_ http.ResponseWriter, r *http.Request) (*user.LoginOutput, error) {
-	jsonInput, err := json.Parse[types.LoginInput](r)
+func (router *RestController) Login(_ http.ResponseWriter, r *http.Request) (*user.LoginOutput, error) {
+	jsonInput, err := json.Parse[LoginInput](r)
 	if err != nil {
 		return nil, err
 	}

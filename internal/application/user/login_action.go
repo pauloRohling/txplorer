@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/application/password"
-	"github.com/pauloRohling/txplorer/internal/application/token"
+	"github.com/pauloRohling/txplorer/internal/domain/password"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
+	"github.com/pauloRohling/txplorer/internal/domain/token"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"time"
 )

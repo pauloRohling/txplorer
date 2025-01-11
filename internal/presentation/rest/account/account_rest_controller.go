@@ -1,4 +1,4 @@
-package router
+package account
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -7,28 +7,27 @@ import (
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
-	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
 	"net/http"
 )
 
-type AccountRouter struct {
+type RestController struct {
 	accountService account.Service
 	secretHolder   presentation.SecretHolder
 }
 
-func NewAccountRouter(accountService account.Service, secretHolder presentation.SecretHolder) *AccountRouter {
-	return &AccountRouter{
+func NewRestController(accountService account.Service, secretHolder presentation.SecretHolder) *RestController {
+	return &RestController{
 		accountService: accountService,
 		secretHolder:   secretHolder,
 	}
 }
 
-func (router *AccountRouter) Endpoint() string {
+func (router *RestController) Endpoint() string {
 	return webserver.AccountsApi
 }
 
-func (router *AccountRouter) Route(r chi.Router) {
+func (router *RestController) Route(r chi.Router) {
 	r.Post("/", webserver.Endpoint(router.Create, http.StatusOK))
 
 	r.Route("/", func(r chi.Router) {
@@ -52,9 +51,9 @@ func (router *AccountRouter) Route(r chi.Router) {
 //	@Failure		400		{object}	model.Error
 //	@Failure		401		{object}	model.Error
 //	@Failure		500		{object}	model.Error
-//	@Router			/accounts [post]
-func (router *AccountRouter) Create(_ http.ResponseWriter, r *http.Request) (*account.CreateAccountOutput, error) {
-	jsonInput, err := json.Parse[types.CreateAccountInput](r)
+//	@RestController			/accounts [post]
+func (router *RestController) Create(_ http.ResponseWriter, r *http.Request) (*account.CreateAccountOutput, error) {
+	jsonInput, err := json.Parse[CreateAccountInput](r)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +79,8 @@ func (router *AccountRouter) Create(_ http.ResponseWriter, r *http.Request) (*ac
 //	@Failure		400	{object}	model.Error
 //	@Failure		401	{object}	model.Error
 //	@Failure		500	{object}	model.Error
-//	@Router			/accounts [get]
-func (router *AccountRouter) Get(_ http.ResponseWriter, r *http.Request) (*account.GetAccountOutput, error) {
+//	@RestController			/accounts [get]
+func (router *RestController) Get(_ http.ResponseWriter, r *http.Request) (*account.GetAccountOutput, error) {
 	userId, err := middleware.GetUserId(r.Context())
 	if err != nil {
 		return nil, err
