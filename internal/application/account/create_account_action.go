@@ -6,7 +6,7 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/password"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
-	"github.com/pauloRohling/txplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
 )
 
 type CreateAccountInput struct {

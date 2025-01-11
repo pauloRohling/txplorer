@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
-	"github.com/pauloRohling/txplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
 )
 
 type Repository struct {

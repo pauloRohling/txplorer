@@ -7,7 +7,7 @@ import (
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
-	"github.com/pauloRohling/txplorer/pkg/transaction"
+	"github.com/pauloRohling/txplorer/internal/persistence/transaction"
 	"time"
 )
 

@@ -6,7 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
-	mockrepository "github.com/pauloRohling/txplorer/mocks/repository"
+	mockaccount "github.com/pauloRohling/txplorer/mocks/account"
+	mockoperation "github.com/pauloRohling/txplorer/mocks/operation"
 	mocktransaction "github.com/pauloRohling/txplorer/mocks/transaction"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -17,8 +18,8 @@ type DepositActionSuite struct {
 	suite.Suite
 	action              *DepositAction
 	transactionManager  *mocktransaction.MockManager
-	accountRepository   *mockrepository.MockAccountRepository
-	operationRepository *mockrepository.MockOperationRepository
+	accountRepository   *mockaccount.MockRepository
+	operationRepository *mockoperation.MockRepository
 }
 
 func TestDepositActionSuite(t *testing.T) {
@@ -28,8 +29,8 @@ func TestDepositActionSuite(t *testing.T) {
 func (suite *DepositActionSuite) SetupTest() {
 	t := suite.T()
 	suite.transactionManager = mocktransaction.NewMockManager(t)
-	suite.accountRepository = mockrepository.NewMockAccountRepository(t)
-	suite.operationRepository = mockrepository.NewMockOperationRepository(t)
+	suite.accountRepository = mockaccount.NewMockRepository(t)
+	suite.operationRepository = mockoperation.NewMockRepository(t)
 	suite.action = NewDepositAction(
 		suite.accountRepository,
 		suite.operationRepository,
