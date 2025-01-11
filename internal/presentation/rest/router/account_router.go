@@ -9,16 +9,15 @@ import (
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
-	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
 )
 
 type AccountRouter struct {
-	accountService service.AccountService
+	accountService account.Service
 	secretHolder   presentation.SecretHolder
 }
 
-func NewAccountRouter(accountService service.AccountService, secretHolder presentation.SecretHolder) *AccountRouter {
+func NewAccountRouter(accountService account.Service, secretHolder presentation.SecretHolder) *AccountRouter {
 	return &AccountRouter{
 		accountService: accountService,
 		secretHolder:   secretHolder,

@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/application/password"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
 	"github.com/pauloRohling/txplorer/internal/application/token"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
+	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"time"
 )
 
@@ -20,13 +20,13 @@ type LoginOutput struct {
 }
 
 type LoginAction struct {
-	userRepository     repository.UserRepository
+	userRepository     user.Repository
 	passwordComparator password.Comparator
 	tokenGenerator     token.Generator
 	tokenExpiration    time.Duration
 }
 
-func NewLoginAction(userRepository repository.UserRepository, passwordComparator password.Comparator, tokenGenerator token.Generator, tokenExpiration time.Duration) *LoginAction {
+func NewLoginAction(userRepository user.Repository, passwordComparator password.Comparator, tokenGenerator token.Generator, tokenExpiration time.Duration) *LoginAction {
 	return &LoginAction{
 		userRepository:     userRepository,
 		passwordComparator: passwordComparator,
@@ -36,16 +36,16 @@ func NewLoginAction(userRepository repository.UserRepository, passwordComparator
 }
 
 func (action *LoginAction) Execute(ctx context.Context, input LoginInput) (*LoginOutput, error) {
-	user, err := action.userRepository.FindByEmail(ctx, input.Email)
+	savedUser, err := action.userRepository.FindByEmail(ctx, input.Email)
 	if err != nil {
 		return nil, throw.NotFoundError("User not found")
 	}
 
-	if isEquals := action.passwordComparator.Compare(user.Password, input.Password); !isEquals {
+	if isEquals := action.passwordComparator.Compare(savedUser.Password, input.Password); !isEquals {
 		return nil, throw.UnauthorizedError("Invalid credentials")
 	}
 
-	claims := action.generateClaims(user.ID)
+	claims := action.generateClaims(savedUser.ID)
 
 	var accessToken string
 	accessToken, err = action.tokenGenerator.Generate(claims)

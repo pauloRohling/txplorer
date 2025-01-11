@@ -6,15 +6,14 @@ import (
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
-	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
 )
 
 type UserRouter struct {
-	userService service.UserService
+	userService user.Service
 }
 
-func NewUserRouter(userService service.UserService) *UserRouter {
+func NewUserRouter(userService user.Service) *UserRouter {
 	return &UserRouter{userService: userService}
 }
 

@@ -3,7 +3,7 @@ package operation
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -21,12 +21,12 @@ type WithdrawOutput struct {
 }
 
 type WithdrawAction struct {
-	accountRepository   repository.AccountRepository
-	operationRepository repository.OperationRepository
+	accountRepository   account.Repository
+	operationRepository operation.Repository
 	transactionManager  transaction.Manager
 }
 
-func NewWithdrawAction(accountRepository repository.AccountRepository, operationRepository repository.OperationRepository, transactionManager transaction.Manager) *WithdrawAction {
+func NewWithdrawAction(accountRepository account.Repository, operationRepository operation.Repository, transactionManager transaction.Manager) *WithdrawAction {
 	return &WithdrawAction{
 		accountRepository:   accountRepository,
 		operationRepository: operationRepository,
@@ -39,12 +39,12 @@ func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) 
 		return nil, throw.ValidationError("Amount must be greater than 0 to make a withdrawal")
 	}
 
-	account, err := action.accountRepository.GetById(ctx, input.AccountID)
+	newAccount, err := action.accountRepository.GetById(ctx, input.AccountID)
 	if err != nil {
 		return nil, throw.InternalError("Failed to get account", err)
 	}
 
-	if account.UserID != input.RequesterID {
+	if newAccount.UserID != input.RequesterID {
 		return nil, throw.UnauthorizedError("You are not authorized to make this withdrawal")
 	}
 
@@ -86,12 +86,12 @@ func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) 
 }
 
 func (action *WithdrawAction) updateBalance(ctx context.Context, input WithdrawInput, operationId uuid.UUID) (*operation.Operation, error) {
-	account, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount*-1)
+	newAccount, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount*-1)
 	if err != nil {
 		return nil, throw.InternalError("Failed to update account balance", err)
 	}
 
-	if account.Balance < 0 {
+	if newAccount.Balance < 0 {
 		return nil, throw.ValidationError("Account balance is negative")
 	}
 

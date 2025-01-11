@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 )
 
@@ -16,18 +15,18 @@ type GetAccountOutput struct {
 }
 
 type GetAccountAction struct {
-	accountRepository repository.AccountRepository
+	accountRepository account.Repository
 }
 
-func NewGetAccountAction(accountRepository repository.AccountRepository) *GetAccountAction {
+func NewGetAccountAction(accountRepository account.Repository) *GetAccountAction {
 	return &GetAccountAction{accountRepository: accountRepository}
 }
 
 func (action *GetAccountAction) Execute(ctx context.Context, input GetAccountInput) (*GetAccountOutput, error) {
-	account, err := action.accountRepository.GetByUserId(ctx, input.UserID)
+	savedAccount, err := action.accountRepository.GetByUserId(ctx, input.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GetAccountOutput{Account: account}, nil
+	return &GetAccountOutput{Account: savedAccount}, nil
 }

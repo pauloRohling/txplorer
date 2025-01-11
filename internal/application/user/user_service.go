@@ -2,14 +2,18 @@ package user
 
 import "context"
 
-type Service struct {
+type Service interface {
+	Login(ctx context.Context, input LoginInput) (*LoginOutput, error)
+}
+
+type FacadeService struct {
 	loginAction *LoginAction
 }
 
-func NewService(loginAction *LoginAction) *Service {
-	return &Service{loginAction: loginAction}
+func NewFacadeService(loginAction *LoginAction) *FacadeService {
+	return &FacadeService{loginAction: loginAction}
 }
 
-func (service *Service) Login(ctx context.Context, input LoginInput) (*LoginOutput, error) {
+func (service *FacadeService) Login(ctx context.Context, input LoginInput) (*LoginOutput, error) {
 	return service.loginAction.Execute(ctx, input)
 }

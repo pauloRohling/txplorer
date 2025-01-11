@@ -1,18 +1,22 @@
-package mapper
+package user
 
 import (
 	"github.com/pauloRohling/txplorer/internal/domain/user"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
-type UserMapper struct {
+type Mapper interface {
+	ToModel(user store.User) *user.User
 }
 
-func NewUserMapper() *UserMapper {
-	return &UserMapper{}
+type StoreMapper struct {
 }
 
-func (mapper *UserMapper) ToModel(savedUser store.User) *user.User {
+func NewStoreMapper() *StoreMapper {
+	return &StoreMapper{}
+}
+
+func (mapper *StoreMapper) ToModel(savedUser store.User) *user.User {
 	return &user.User{
 		ID:        savedUser.ID,
 		Name:      savedUser.Name,
@@ -22,3 +26,5 @@ func (mapper *UserMapper) ToModel(savedUser store.User) *user.User {
 		UpdatedAt: savedUser.UpdatedAt,
 	}
 }
+
+var _ Mapper = (*StoreMapper)(nil)

@@ -3,7 +3,7 @@ package operation
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -21,12 +21,12 @@ type DepositOutput struct {
 }
 
 type DepositAction struct {
-	accountRepository   repository.AccountRepository
-	operationRepository repository.OperationRepository
+	accountRepository   account.Repository
+	operationRepository operation.Repository
 	transactionManager  transaction.Manager
 }
 
-func NewDepositAction(accountRepository repository.AccountRepository, operationRepository repository.OperationRepository, transactionManager transaction.Manager) *DepositAction {
+func NewDepositAction(accountRepository account.Repository, operationRepository operation.Repository, transactionManager transaction.Manager) *DepositAction {
 	return &DepositAction{
 		accountRepository:   accountRepository,
 		operationRepository: operationRepository,
@@ -77,12 +77,12 @@ func (action *DepositAction) Execute(ctx context.Context, input DepositInput) (*
 }
 
 func (action *DepositAction) updateBalance(ctx context.Context, input DepositInput, operationId uuid.UUID) (*operation.Operation, error) {
-	account, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount)
+	updatedAccount, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount)
 	if err != nil {
 		return nil, throw.InternalError("Failed to update account balance", err)
 	}
 
-	if account.Balance < 0 {
+	if updatedAccount.Balance < 0 {
 		return nil, throw.ValidationError("Account balance is negative")
 	}
 

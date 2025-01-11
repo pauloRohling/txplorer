@@ -10,8 +10,9 @@ import (
 	"github.com/pauloRohling/txplorer/internal/application/operation"
 	"github.com/pauloRohling/txplorer/internal/application/user"
 	"github.com/pauloRohling/txplorer/internal/environment"
-	"github.com/pauloRohling/txplorer/internal/mapper"
-	"github.com/pauloRohling/txplorer/internal/persistence"
+	accountPersitence "github.com/pauloRohling/txplorer/internal/persistence/account"
+	operationPersistence "github.com/pauloRohling/txplorer/internal/persistence/operation"
+	userPersistence "github.com/pauloRohling/txplorer/internal/persistence/user"
 	presentation "github.com/pauloRohling/txplorer/internal/presentation/rest/auth"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/router"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
@@ -61,13 +62,13 @@ func main() {
 	tokenGenerator := presentation.NewJwtGenerator(secretHolder)
 	txManager := tx.NewPostgresTxManager(db)
 
-	accountMapper := mapper.NewAccountMapper()
-	operationMapper := mapper.NewOperationMapper()
-	userMapper := mapper.NewUserMapper()
+	accountMapper := accountPersitence.NewStoreMapper()
+	operationMapper := operationPersistence.NewStoreMapper()
+	userMapper := userPersistence.NewStoreMapper()
 
-	accountRepository := persistence.NewAccountRepository(db, accountMapper)
-	operationRepository := persistence.NewOperationRepository(db, operationMapper)
-	userRepository := persistence.NewUserRepository(db, userMapper)
+	accountRepository := accountPersitence.NewRepository(db, accountMapper)
+	operationRepository := operationPersistence.NewRepository(db, operationMapper)
+	userRepository := userPersistence.NewRepository(db, userMapper)
 
 	createAccountAction := account.NewCreateAccountAction(accountRepository, userRepository, txManager, passwordEncoder)
 	getAccountAction := account.NewGetAccountAction(accountRepository)
@@ -76,9 +77,9 @@ func main() {
 	transferAction := operation.NewTransferAction(accountRepository, operationRepository, txManager)
 	withdrawAction := operation.NewWithdrawAction(accountRepository, operationRepository, txManager)
 
-	accountService := account.NewService(createAccountAction, getAccountAction)
-	operationService := operation.NewService(depositAction, transferAction, withdrawAction)
-	userService := user.NewService(loginAction)
+	accountService := account.NewFacadeService(createAccountAction, getAccountAction)
+	operationService := operation.NewFacadeService(depositAction, transferAction, withdrawAction)
+	userService := user.NewFacadeService(loginAction)
 
 	accountRouter := router.NewAccountRouter(accountService, secretHolder)
 	operationRouter := router.NewOperationRouter(operationService, secretHolder)

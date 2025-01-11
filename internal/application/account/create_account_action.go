@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 	"github.com/pauloRohling/txplorer/internal/application/password"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/domain/user"
@@ -21,13 +20,13 @@ type CreateAccountOutput struct {
 }
 
 type CreateAccountAction struct {
-	accountRepository  repository.AccountRepository
-	userRepository     repository.UserRepository
+	accountRepository  account.Repository
+	userRepository     user.Repository
 	transactionManager transaction.Manager
 	passwordEncoder    password.Encoder
 }
 
-func NewCreateAccountAction(accountRepository repository.AccountRepository, userRepository repository.UserRepository, transactionManager transaction.Manager, passwordEncoder password.Encoder) *CreateAccountAction {
+func NewCreateAccountAction(accountRepository account.Repository, userRepository user.Repository, transactionManager transaction.Manager, passwordEncoder password.Encoder) *CreateAccountAction {
 	return &CreateAccountAction{
 		accountRepository:  accountRepository,
 		userRepository:     userRepository,
@@ -55,16 +54,16 @@ func (action *CreateAccountAction) Execute(ctx context.Context, input CreateAcco
 		return nil, throw.InternalError("Failed to encode password", err)
 	}
 
-	var user *user.User
-	var account *account.Account
+	var newUser *user.User
+	var newAccount *account.Account
 
 	err = action.transactionManager.RunTransaction(ctx, func(ctx context.Context) error {
-		user, err = action.userRepository.Create(ctx, input.Name, input.Email, input.Password)
+		newUser, err = action.userRepository.Create(ctx, input.Name, input.Email, input.Password)
 		if err != nil {
 			return throw.InternalError("Failed to create user", err)
 		}
 
-		account, err = action.accountRepository.Create(ctx, user.ID)
+		newAccount, err = action.accountRepository.Create(ctx, newUser.ID)
 		if err != nil {
 			return throw.InternalError("Failed to create account", err)
 		}
@@ -76,5 +75,5 @@ func (action *CreateAccountAction) Execute(ctx context.Context, input CreateAcco
 		return nil, err
 	}
 
-	return &CreateAccountOutput{Account: account}, nil
+	return &CreateAccountOutput{Account: newAccount}, nil
 }

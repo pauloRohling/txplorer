@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/application/repository"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -23,12 +23,12 @@ type TransferOutput struct {
 }
 
 type TransferAction struct {
-	accountRepository   repository.AccountRepository
-	operationRepository repository.OperationRepository
+	accountRepository   account.Repository
+	operationRepository operation.Repository
 	transactionManager  transaction.Manager
 }
 
-func NewTransferAction(accountRepository repository.AccountRepository, operationRepository repository.OperationRepository, transactionManager transaction.Manager) *TransferAction {
+func NewTransferAction(accountRepository account.Repository, operationRepository operation.Repository, transactionManager transaction.Manager) *TransferAction {
 	return &TransferAction{
 		accountRepository:   accountRepository,
 		operationRepository: operationRepository,
@@ -45,12 +45,12 @@ func (action *TransferAction) Execute(ctx context.Context, input TransferInput) 
 		return nil, throw.ValidationError("Invalid amount")
 	}
 
-	account, err := action.accountRepository.GetById(ctx, input.FromAccountID)
+	newAccount, err := action.accountRepository.GetById(ctx, input.FromAccountID)
 	if err != nil {
 		return nil, throw.InternalError("Failed to get account", err)
 	}
 
-	if account.UserID != input.RequesterID {
+	if newAccount.UserID != input.RequesterID {
 		return nil, throw.UnauthorizedError("You are not authorized to make this withdrawal")
 	}
 

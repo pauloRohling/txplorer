@@ -1,18 +1,22 @@
-package mapper
+package operation
 
 import (
 	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
-type OperationMapper struct {
+type Mapper interface {
+	ToModel(operation store.Operation) *operation.Operation
 }
 
-func NewOperationMapper() *OperationMapper {
-	return &OperationMapper{}
+type StoreMapper struct {
 }
 
-func (mapper *OperationMapper) ToModel(savedOperation store.Operation) *operation.Operation {
+func NewStoreMapper() *StoreMapper {
+	return &StoreMapper{}
+}
+
+func (mapper *StoreMapper) ToModel(savedOperation store.Operation) *operation.Operation {
 	return &operation.Operation{
 		ID:            savedOperation.ID,
 		FromAccountID: savedOperation.FromAccountID,

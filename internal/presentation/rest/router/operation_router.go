@@ -9,16 +9,15 @@ import (
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/middleware"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/types"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/webserver"
-	"github.com/pauloRohling/txplorer/internal/presentation/service"
 	"net/http"
 )
 
 type OperationRouter struct {
-	operationService service.OperationService
+	operationService operation.Service
 	secretHolder     presentation.SecretHolder
 }
 
-func NewOperationRouter(operationService service.OperationService, secretHolder presentation.SecretHolder) *OperationRouter {
+func NewOperationRouter(operationService operation.Service, secretHolder presentation.SecretHolder) *OperationRouter {
 	return &OperationRouter{operationService: operationService, secretHolder: secretHolder}
 }
 

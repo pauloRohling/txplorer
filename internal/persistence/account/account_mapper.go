@@ -1,18 +1,22 @@
-package mapper
+package account
 
 import (
 	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
-type AccountMapper struct {
+type Mapper interface {
+	ToModel(account store.Account) *account.Account
 }
 
-func NewAccountMapper() *AccountMapper {
-	return &AccountMapper{}
+type StoreMapper struct {
 }
 
-func (mapper *AccountMapper) ToModel(savedAccount store.Account) *account.Account {
+func NewStoreMapper() *StoreMapper {
+	return &StoreMapper{}
+}
+
+func (mapper *StoreMapper) ToModel(savedAccount store.Account) *account.Account {
 	return &account.Account{
 		ID:        savedAccount.ID,
 		Balance:   savedAccount.Balance,
@@ -22,3 +26,5 @@ func (mapper *AccountMapper) ToModel(savedAccount store.Account) *account.Accoun
 		Status:    account.Status(savedAccount.Status),
 	}
 }
+
+var _ Mapper = (*StoreMapper)(nil)
