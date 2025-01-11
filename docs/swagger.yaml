@@ -181,7 +181,7 @@ info:
     between their accounts.
   license:
     name: MIT
-    url: https://github.com/pauloRohling/txplorer/blob/master/LICENSE
+    url: https://github.com/pauloRohling/txplorer/blob/main/LICENSE
   title: TxPlorer API
   version: "1.0"
 paths:

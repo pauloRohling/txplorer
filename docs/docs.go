@@ -15,7 +15,7 @@ const docTemplate = `{
         },
         "license": {
             "name": "MIT",
-            "url": "https://github.com/pauloRohling/txplorer/blob/master/LICENSE"
+            "url": "https://github.com/pauloRohling/txplorer/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },

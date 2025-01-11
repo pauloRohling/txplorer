@@ -34,7 +34,7 @@ var start = time.Now()
 //	@contact.name	API Support
 //	@contact.url	https://github.com/pauloRohling/txplorer
 //	@license.name	MIT
-//	@license.url	https://github.com/pauloRohling/txplorer/blob/master/LICENSE
+//	@license.url	https://github.com/pauloRohling/txplorer/blob/main/LICENSE
 //	@securityDefinitions.apikey	BearerAuth
 //	@in							header
 //	@name						Authorization
