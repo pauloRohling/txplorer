@@ -4,8 +4,8 @@ package mockrepository
 
 import (
 	context "context"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
 
-	model "github.com/pauloRohling/txplorer/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"
@@ -25,27 +25,27 @@ func (_m *MockOperationRepository) EXPECT() *MockOperationRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, entity
-func (_m *MockOperationRepository) Create(ctx context.Context, entity *model.Operation) (*model.Operation, error) {
+func (_m *MockOperationRepository) Create(ctx context.Context, entity *operation.Operation) (*operation.Operation, error) {
 	ret := _m.Called(ctx, entity)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 *model.Operation
+	var r0 *operation.Operation
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.Operation) (*model.Operation, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *operation.Operation) (*operation.Operation, error)); ok {
 		return rf(ctx, entity)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.Operation) *model.Operation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *operation.Operation) *operation.Operation); ok {
 		r0 = rf(ctx, entity)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Operation)
+			r0 = ret.Get(0).(*operation.Operation)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.Operation) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *operation.Operation) error); ok {
 		r1 = rf(ctx, entity)
 	} else {
 		r1 = ret.Error(1)
@@ -66,45 +66,45 @@ func (_e *MockOperationRepository_Expecter) Create(ctx interface{}, entity inter
 	return &MockOperationRepository_Create_Call{Call: _e.mock.On("Create", ctx, entity)}
 }
 
-func (_c *MockOperationRepository_Create_Call) Run(run func(ctx context.Context, entity *model.Operation)) *MockOperationRepository_Create_Call {
+func (_c *MockOperationRepository_Create_Call) Run(run func(ctx context.Context, entity *operation.Operation)) *MockOperationRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.Operation))
+		run(args[0].(context.Context), args[1].(*operation.Operation))
 	})
 	return _c
 }
 
-func (_c *MockOperationRepository_Create_Call) Return(_a0 *model.Operation, _a1 error) *MockOperationRepository_Create_Call {
+func (_c *MockOperationRepository_Create_Call) Return(_a0 *operation.Operation, _a1 error) *MockOperationRepository_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockOperationRepository_Create_Call) RunAndReturn(run func(context.Context, *model.Operation) (*model.Operation, error)) *MockOperationRepository_Create_Call {
+func (_c *MockOperationRepository_Create_Call) RunAndReturn(run func(context.Context, *operation.Operation) (*operation.Operation, error)) *MockOperationRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateStatus provides a mock function with given fields: ctx, id, status
-func (_m *MockOperationRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.OperationStatus) (*model.Operation, error) {
+func (_m *MockOperationRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status operation.Status) (*operation.Operation, error) {
 	ret := _m.Called(ctx, id, status)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateStatus")
 	}
 
-	var r0 *model.Operation
+	var r0 *operation.Operation
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.OperationStatus) (*model.Operation, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, operation.Status) (*operation.Operation, error)); ok {
 		return rf(ctx, id, status)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.OperationStatus) *model.Operation); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, operation.Status) *operation.Operation); ok {
 		r0 = rf(ctx, id, status)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Operation)
+			r0 = ret.Get(0).(*operation.Operation)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.OperationStatus) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, operation.Status) error); ok {
 		r1 = rf(ctx, id, status)
 	} else {
 		r1 = ret.Error(1)
@@ -121,24 +121,24 @@ type MockOperationRepository_UpdateStatus_Call struct {
 // UpdateStatus is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uuid.UUID
-//   - status domain.OperationStatus
+//   - status domain.Status
 func (_e *MockOperationRepository_Expecter) UpdateStatus(ctx interface{}, id interface{}, status interface{}) *MockOperationRepository_UpdateStatus_Call {
 	return &MockOperationRepository_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, id, status)}
 }
 
-func (_c *MockOperationRepository_UpdateStatus_Call) Run(run func(ctx context.Context, id uuid.UUID, status model.OperationStatus)) *MockOperationRepository_UpdateStatus_Call {
+func (_c *MockOperationRepository_UpdateStatus_Call) Run(run func(ctx context.Context, id uuid.UUID, status operation.Status)) *MockOperationRepository_UpdateStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.OperationStatus))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(operation.Status))
 	})
 	return _c
 }
 
-func (_c *MockOperationRepository_UpdateStatus_Call) Return(_a0 *model.Operation, _a1 error) *MockOperationRepository_UpdateStatus_Call {
+func (_c *MockOperationRepository_UpdateStatus_Call) Return(_a0 *operation.Operation, _a1 error) *MockOperationRepository_UpdateStatus_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockOperationRepository_UpdateStatus_Call) RunAndReturn(run func(context.Context, uuid.UUID, model.OperationStatus) (*model.Operation, error)) *MockOperationRepository_UpdateStatus_Call {
+func (_c *MockOperationRepository_UpdateStatus_Call) RunAndReturn(run func(context.Context, uuid.UUID, operation.Status) (*operation.Operation, error)) *MockOperationRepository_UpdateStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 )
 
@@ -12,13 +12,13 @@ func NewAccountMapper() *AccountMapper {
 	return &AccountMapper{}
 }
 
-func (mapper *AccountMapper) ToModel(account store.Account) *domain.Account {
-	return &domain.Account{
-		ID:        account.ID,
-		Balance:   account.Balance,
-		UserID:    account.UserID,
-		CreatedAt: account.CreatedAt,
-		UpdatedAt: account.UpdatedAt,
-		Status:    domain.AccountStatus(account.Status),
+func (mapper *AccountMapper) ToModel(savedAccount store.Account) *account.Account {
+	return &account.Account{
+		ID:        savedAccount.ID,
+		Balance:   savedAccount.Balance,
+		UserID:    savedAccount.UserID,
+		CreatedAt: savedAccount.CreatedAt,
+		UpdatedAt: savedAccount.UpdatedAt,
+		Status:    account.Status(savedAccount.Status),
 	}
 }

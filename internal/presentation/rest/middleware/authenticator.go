@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/v2/jwt"
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/internal/presentation/rest/json"
 	"net/http"
 )
@@ -22,12 +22,12 @@ func Authenticator(jwtAuth *jwtauth.JWTAuth) func(http.Handler) http.Handler {
 			token, claims, err := jwtauth.FromContext(r.Context())
 
 			if err != nil {
-				json.WriteError(w, domain.UnauthorizedError("Could not find token in context", err))
+				json.WriteError(w, throw.UnauthorizedError("Could not find token in context", err))
 				return
 			}
 
 			if token == nil || jwt.Validate(token, jwtAuth.ValidateOptions()...) != nil {
-				json.WriteError(w, domain.UnauthorizedError("Token is not valid"))
+				json.WriteError(w, throw.UnauthorizedError("Token is not valid"))
 				return
 			}
 
@@ -45,12 +45,12 @@ func Authenticator(jwtAuth *jwtauth.JWTAuth) func(http.Handler) http.Handler {
 func createAuthContext(ctx context.Context, claims Claims) (context.Context, error) {
 	sub, ok := claims["sub"].(string)
 	if !ok {
-		return nil, domain.UnauthorizedError("Could not find 'sub' claim")
+		return nil, throw.UnauthorizedError("Could not find 'sub' claim")
 	}
 
 	userId, err := uuid.Parse(sub)
 	if err != nil {
-		return nil, domain.UnauthorizedError("Could not parse 'sub' claim as uuid")
+		return nil, throw.UnauthorizedError("Could not parse 'sub' claim as uuid")
 	}
 
 	ctx = context.WithValue(ctx, UserIdContextKey, userId)
@@ -60,7 +60,7 @@ func createAuthContext(ctx context.Context, claims Claims) (context.Context, err
 func GetUserId(ctx context.Context) (uuid.UUID, error) {
 	userId, ok := ctx.Value(UserIdContextKey).(uuid.UUID)
 	if !ok {
-		return uuid.UUID{}, domain.UnauthorizedError("could not get 'userId' from context")
+		return uuid.UUID{}, throw.UnauthorizedError("could not get 'userId' from context")
 	}
 	return userId, nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	"github.com/pauloRohling/txplorer/internal/persistence/mapper"
 	"github.com/pauloRohling/txplorer/internal/persistence/store"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
@@ -29,7 +29,7 @@ func (repository *OperationRepository) query(ctx context.Context) *store.Queries
 	return store.New(repository.db)
 }
 
-func (repository *OperationRepository) Create(ctx context.Context, entity *domain.Operation) (*domain.Operation, error) {
+func (repository *OperationRepository) Create(ctx context.Context, entity *operation.Operation) (*operation.Operation, error) {
 	transactionEntity, err := repository.query(ctx).InsertOperation(ctx, store.InsertOperationParams{
 		ID:            entity.ID,
 		FromAccountID: entity.FromAccountID,
@@ -46,7 +46,7 @@ func (repository *OperationRepository) Create(ctx context.Context, entity *domai
 	return repository.operationMapper.ToModel(transactionEntity), nil
 }
 
-func (repository *OperationRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status domain.OperationStatus) (*domain.Operation, error) {
+func (repository *OperationRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status operation.Status) (*operation.Operation, error) {
 	transactionEntity, err := repository.query(ctx).UpdateOperationStatus(ctx, store.UpdateOperationStatusParams{
 		ID:     id,
 		Status: status.String(),

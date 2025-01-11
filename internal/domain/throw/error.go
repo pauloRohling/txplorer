@@ -1,4 +1,4 @@
-package domain
+package throw
 
 import (
 	"errors"

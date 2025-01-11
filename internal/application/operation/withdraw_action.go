@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/pauloRohling/txplorer/internal/application/repository"
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
+	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"github.com/pauloRohling/txplorer/pkg/transaction"
 	"time"
 )
@@ -16,7 +17,7 @@ type WithdrawInput struct {
 }
 
 type WithdrawOutput struct {
-	*domain.Operation
+	*operation.Operation
 }
 
 type WithdrawAction struct {
@@ -35,69 +36,69 @@ func NewWithdrawAction(accountRepository repository.AccountRepository, operation
 
 func (action *WithdrawAction) Execute(ctx context.Context, input WithdrawInput) (*WithdrawOutput, error) {
 	if input.Amount <= 0 {
-		return nil, domain.ValidationError("Amount must be greater than 0 to make a withdrawal")
+		return nil, throw.ValidationError("Amount must be greater than 0 to make a withdrawal")
 	}
 
 	account, err := action.accountRepository.GetById(ctx, input.AccountID)
 	if err != nil {
-		return nil, domain.InternalError("Failed to get account", err)
+		return nil, throw.InternalError("Failed to get account", err)
 	}
 
 	if account.UserID != input.RequesterID {
-		return nil, domain.UnauthorizedError("You are not authorized to make this withdrawal")
+		return nil, throw.UnauthorizedError("You are not authorized to make this withdrawal")
 	}
 
 	operationId, err := uuid.NewV7()
 	if err != nil {
-		return nil, domain.InternalError("Failed to generate operation id", err)
+		return nil, throw.InternalError("Failed to generate operation id", err)
 	}
 
-	withdrawOperation := &domain.Operation{
+	withdrawOperation := &operation.Operation{
 		ID:            operationId,
 		FromAccountID: input.AccountID,
 		ToAccountID:   input.AccountID,
 		Amount:        input.Amount,
-		Type:          domain.OperationTypeWithdraw.String(),
+		Type:          operation.WithdrawType.String(),
 		CreatedAt:     time.Now().UTC(),
 		CreatedBy:     input.RequesterID,
-		Status:        domain.OperationStatusPending,
+		Status:        operation.PendingStatus,
 	}
 
-	operation, err := action.operationRepository.Create(ctx, withdrawOperation)
+	newOperation, err := action.operationRepository.Create(ctx, withdrawOperation)
 	if err != nil {
 		return nil, err
 	}
 
 	err = action.transactionManager.RunTransaction(ctx, func(ctx context.Context) error {
-		operation, err = action.updateBalance(ctx, input, operationId)
+		newOperation, err = action.updateBalance(ctx, input, operationId)
 		return err
 	})
 
 	if err != nil {
-		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, domain.OperationStatusFailed)
+		_, errOperation := action.operationRepository.UpdateStatus(ctx, operationId, operation.FailedStatus)
 		if errOperation != nil {
-			return nil, domain.InternalError("Failed to update operation status to FAILED", errOperation)
+			return nil, throw.InternalError("Failed to update operation status to FAILED", errOperation)
 		}
 		return nil, err
 	}
 
-	return &WithdrawOutput{Operation: operation}, nil
+	return &WithdrawOutput{Operation: newOperation}, nil
 }
 
-func (action *WithdrawAction) updateBalance(ctx context.Context, input WithdrawInput, operationId uuid.UUID) (*domain.Operation, error) {
+func (action *WithdrawAction) updateBalance(ctx context.Context, input WithdrawInput, operationId uuid.UUID) (*operation.Operation, error) {
 	account, err := action.accountRepository.AddBalanceById(ctx, input.AccountID, input.Amount*-1)
 	if err != nil {
-		return nil, domain.InternalError("Failed to update account balance", err)
+		return nil, throw.InternalError("Failed to update account balance", err)
 	}
 
 	if account.Balance < 0 {
-		return nil, domain.ValidationError("Account balance is negative")
+		return nil, throw.ValidationError("Account balance is negative")
 	}
 
-	operation, err := action.operationRepository.UpdateStatus(ctx, operationId, domain.OperationStatusSuccess)
+	updatedOperation, err := action.operationRepository.UpdateStatus(ctx, operationId, operation.SuccessStatus)
 	if err != nil {
-		return nil, domain.InternalError("Failed to update operation status to SUCCESS", err)
+		return nil, throw.InternalError("Failed to update operation status to SUCCESS", err)
 	}
 
-	return operation, nil
+	return updatedOperation, nil
 }

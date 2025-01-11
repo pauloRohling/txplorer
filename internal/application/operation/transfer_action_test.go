@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/account"
+	"github.com/pauloRohling/txplorer/internal/domain/operation"
 	mockrepository "github.com/pauloRohling/txplorer/mocks/repository"
 	mocktransaction "github.com/pauloRohling/txplorer/mocks/transaction"
 	"github.com/stretchr/testify/mock"
@@ -46,13 +47,13 @@ func (suite *TransferActionSuite) TestShouldTransferSuccessfully() {
 		Amount:        100,
 	}
 
-	expectedOperation := &domain.Operation{
+	expectedOperation := &operation.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.ToAccountID,
 		UserID:  userId,
 		Balance: 10000,
@@ -115,7 +116,7 @@ func (suite *TransferActionSuite) TestShouldFailOnOperationCreationError() {
 		Amount:        100,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.FromAccountID,
 		UserID:  userId,
 		Balance: 10000,
@@ -144,13 +145,13 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 		Amount:        100,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.FromAccountID,
 		UserID:  userId,
 		Balance: 10000,
 	}
 
-	expectedOperation := &domain.Operation{
+	expectedOperation := &operation.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
@@ -169,7 +170,7 @@ func (suite *TransferActionSuite) TestShouldUpdateStatusToFailedOnTransactionErr
 		Return(fmt.Errorf("failed to update balances"))
 
 	suite.operationRepository.EXPECT().
-		UpdateStatus(mock.Anything, mock.Anything, domain.OperationStatusFailed).
+		UpdateStatus(mock.Anything, mock.Anything, operation.FailedStatus).
 		Return(expectedOperation, nil)
 
 	output, err := suite.action.Execute(context.TODO(), input)
@@ -187,13 +188,13 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusError() {
 		Amount:        100,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.FromAccountID,
 		UserID:  userId,
 		Balance: 10000,
 	}
 
-	expectedOperation := &domain.Operation{
+	expectedOperation := &operation.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
@@ -212,7 +213,7 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusError() {
 		Return(fmt.Errorf("failed to update balances"))
 
 	suite.operationRepository.EXPECT().
-		UpdateStatus(mock.Anything, mock.Anything, domain.OperationStatusFailed).
+		UpdateStatus(mock.Anything, mock.Anything, operation.FailedStatus).
 		Return(nil, fmt.Errorf("failed to update status"))
 
 	output, err := suite.action.Execute(context.TODO(), input)
@@ -244,7 +245,7 @@ func (suite *TransferActionSuite) TestShouldFailOnAddBalanceOnToAccountError() {
 		Amount:        100,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.ToAccountID,
 		Balance: 10000,
 	}
@@ -270,13 +271,13 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		Amount:        100,
 	}
 
-	expectedOperation := &domain.Operation{
+	expectedOperation := &operation.Operation{
 		FromAccountID: input.FromAccountID,
 		ToAccountID:   input.ToAccountID,
 		Amount:        input.Amount,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.ToAccountID,
 		Balance: 10000,
 	}
@@ -287,7 +288,7 @@ func (suite *TransferActionSuite) TestShouldFailOnUpdateStatusToSuccessError() {
 		Times(2)
 
 	suite.operationRepository.EXPECT().
-		UpdateStatus(mock.Anything, mock.Anything, domain.OperationStatusSuccess).
+		UpdateStatus(mock.Anything, mock.Anything, operation.SuccessStatus).
 		Return(nil, fmt.Errorf("failed to update status"))
 
 	output, err := suite.action.updateBalances(context.TODO(), input, expectedOperation.ID)
@@ -302,7 +303,7 @@ func (suite *TransferActionSuite) TestShouldFailOnFromAccountNegativeBalanceErro
 		Amount:        100,
 	}
 
-	expectedAccount := &domain.Account{
+	expectedAccount := &account.Account{
 		ID:      input.FromAccountID,
 		Balance: -10000,
 	}
@@ -323,12 +324,12 @@ func (suite *TransferActionSuite) TestShouldFailOnToAccountNegativeBalanceError(
 		Amount:        100,
 	}
 
-	expectedFromAccount := &domain.Account{
+	expectedFromAccount := &account.Account{
 		ID:      input.FromAccountID,
 		Balance: 10000,
 	}
 
-	expectedToAccount := &domain.Account{
+	expectedToAccount := &account.Account{
 		ID:      input.FromAccountID,
 		Balance: -10000,
 	}

@@ -1,7 +1,7 @@
 package json
 
 import (
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"net/http"
 	"time"
 )
@@ -14,7 +14,7 @@ type Response struct {
 	Timestamp string `json:"timestamp"`
 }
 
-func NewResponseFromError(err domain.Error) Response {
+func NewResponseFromError(err throw.Error) Response {
 	status := ErrorStatus(err)
 	return Response{
 		Status:    status,
@@ -25,17 +25,17 @@ func NewResponseFromError(err domain.Error) Response {
 	}
 }
 
-func ErrorStatus(err domain.Error) int {
+func ErrorStatus(err throw.Error) int {
 	switch err.Type {
-	case domain.InternalErrorType:
+	case throw.InternalErrorType:
 		return http.StatusInternalServerError
-	case domain.ForbiddenErrorType:
+	case throw.ForbiddenErrorType:
 		return http.StatusForbidden
-	case domain.NotFoundErrorType:
+	case throw.NotFoundErrorType:
 		return http.StatusNotFound
-	case domain.UnauthorizedErrorType:
+	case throw.UnauthorizedErrorType:
 		return http.StatusUnauthorized
-	case domain.ValidationErrorType:
+	case throw.ValidationErrorType:
 		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError

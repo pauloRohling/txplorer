@@ -4,8 +4,8 @@ package mockrepository
 
 import (
 	context "context"
+	model "github.com/pauloRohling/txplorer/internal/domain/user"
 
-	model "github.com/pauloRohling/txplorer/internal/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 

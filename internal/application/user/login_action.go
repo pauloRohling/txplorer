@@ -6,7 +6,7 @@ import (
 	"github.com/pauloRohling/txplorer/internal/application/password"
 	"github.com/pauloRohling/txplorer/internal/application/repository"
 	"github.com/pauloRohling/txplorer/internal/application/token"
-	"github.com/pauloRohling/txplorer/internal/domain"
+	"github.com/pauloRohling/txplorer/internal/domain/throw"
 	"time"
 )
 
@@ -38,11 +38,11 @@ func NewLoginAction(userRepository repository.UserRepository, passwordComparator
 func (action *LoginAction) Execute(ctx context.Context, input LoginInput) (*LoginOutput, error) {
 	user, err := action.userRepository.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return nil, domain.NotFoundError("User not found")
+		return nil, throw.NotFoundError("User not found")
 	}
 
 	if isEquals := action.passwordComparator.Compare(user.Password, input.Password); !isEquals {
-		return nil, domain.UnauthorizedError("Invalid credentials")
+		return nil, throw.UnauthorizedError("Invalid credentials")
 	}
 
 	claims := action.generateClaims(user.ID)
