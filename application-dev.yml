@@ -1,7 +1,0 @@
-security:
-  secret: secret
-
-database:
-  host: localhost
-  user: postgres
-  password: postgres

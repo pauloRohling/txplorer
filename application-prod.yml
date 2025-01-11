@@ -1,4 +1,0 @@
-database:
-  host: rds
-  user: rds-user
-  password: rds-password

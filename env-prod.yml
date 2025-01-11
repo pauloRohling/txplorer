@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+security:
+  secret: secret-prod
+  token-expiration: 24h
+
+database:
+  host: rds
+  port: 5432
+  user: rds-user
+  password: rds-password
+  name: txplorer
+  ssl: false
+  pool:
+    max-open-conns: 100
+    max-idle-conns: 10
+    conn-max-lifetime: 5m
+    conn-max-idle-time: 30s
