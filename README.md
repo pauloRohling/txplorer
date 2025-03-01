@@ -18,18 +18,17 @@ the business logic, while the persistence layer handles the transactional aspect
 - View account balances
 - View transaction history
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - [Go](https://go.dev/doc/install)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [Docker](https://www.docker.com/products/docker-desktop)
-- [mockery](https://github.com/vektra/mockery)
-- [sqlc](https://github.com/kyleconroy/sqlc)
-- [migrate](https://github.com/golang-migrate/migrate)
-- [make](https://www.gnu.org/software/make/)
-- [swag](https://github.com/swaggo/swag)
+- [Air](https://github.com/air-verse/air)
+- [Make](https://www.gnu.org/software/make/)
+- [Migrate](https://github.com/golang-migrate/migrate)
+- [Mockery](https://github.com/vektra/mockery)
+- [Sqlc](https://github.com/kyleconroy/sqlc)
+- [Swag](https://github.com/swaggo/swag)
 
 ## API
 
